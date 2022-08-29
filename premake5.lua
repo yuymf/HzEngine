@@ -11,6 +11,12 @@ workspace "MyHazel"
 	
 	outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+--include directories relatave to root folders
+IncludeDir = {}
+IncludeDir["GLFW"] = "MyHazel/vendor/GLFW/include"
+
+include "MyHazel/vendor/GLFW"												--copy premake5 file in this dir;
+
 project "MyHazel"
 	location "MyHazel"
 	kind "SharedLib"
@@ -18,6 +24,9 @@ project "MyHazel"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	pchheader "hzpch.h"
+	pchsource "MyHazel/src/hzpch.cpp"
 
 	files
 	{
@@ -27,8 +36,15 @@ project "MyHazel"
 
 	includedirs
 	{
-		"%{prj.name}/src"
-		"%{prj.name}/vendor/spdlog/include"
+		"%{prj.name}/src",
+		"%{prj.name}/vendor/spdlog/include",
+		"%{IncludeDir.GLFW}"
+	}
+
+	links
+	{
+		"GLFW",
+		"opengl32.lib"
 	}
 
 	filter "system:windows"
