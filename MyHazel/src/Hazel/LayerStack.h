@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core.h"
+#include "Hazel/Core.h"
 #include "Layer.h"
 
 #include <vector>
@@ -10,7 +10,7 @@ namespace Hazel {
 	class LayerStack
 	{
 	public:
-		LayerStack() = default;
+		LayerStack();
 		~LayerStack();
 
 		void PushLayer(Layer* layer);
@@ -29,7 +29,8 @@ namespace Hazel {
 		std::vector<Layer*>::const_reverse_iterator rend() const { return m_Layers.rend(); }
 	private:
 		std::vector<Layer*> m_Layers;
-		unsigned int m_LayerInsertIndex = 0;
+		//unsigned int m_LayerInsertIndex = 0;
+		std::vector<Layer*>::iterator m_LayerInsert;
 	};
 
 }

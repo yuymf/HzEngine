@@ -42,7 +42,7 @@ namespace Hazel {
 	public:
 		//virtual ~Event() = default;
 
-		//bool Handled = false;
+		bool Handled = false;
 
 		virtual EventType GetEventType() const = 0; //pure virtual, must done;
 		virtual const char* GetName() const = 0;
@@ -53,8 +53,7 @@ namespace Hazel {
 		{
 			return GetCategoryFlags() & category;
 		}
-	protected:
-		bool Handled = false;
+
 	};
 
 	class EventDispatcher
