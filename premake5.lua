@@ -14,8 +14,10 @@ workspace "MyHazel"
 --include directories relatave to root folders
 IncludeDir = {}
 IncludeDir["GLFW"] = "MyHazel/vendor/GLFW/include"
+IncludeDir["Glad"] = "MyHazel/vendor/Glad/include"
 
 include "MyHazel/vendor/GLFW"												--copy premake5 file in this dir;
+include "MyHazel/vendor/Glad"
 
 project "MyHazel"
 	location "MyHazel"
@@ -38,12 +40,14 @@ project "MyHazel"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		"%{IncludeDir.GLFW}"
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}"
 	}
 
 	links
 	{
 		"GLFW",
+		"Glad",
 		"opengl32.lib"
 	}
 
@@ -55,7 +59,8 @@ project "MyHazel"
 		defines
 		{
 			"HZ_PLATFORM_WINDOWS",
-			"HZ_BUILD_DLL"
+			"HZ_BUILD_DLL",
+			"GLFW_INCLUDE_NONE"
 		}
 
 		postbuildcommands
