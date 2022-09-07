@@ -5,7 +5,7 @@
 
 namespace Hazel {
 
-	class Layer
+	class HAZEL_API Layer													//if miss HAZEL_API, link error appears at Sandbox.exe;
 	{
 	public:
 		Layer(const std::string& name = "Layer");

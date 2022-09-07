@@ -15,9 +15,11 @@ workspace "MyHazel"
 IncludeDir = {}
 IncludeDir["GLFW"] = "MyHazel/vendor/GLFW/include"
 IncludeDir["Glad"] = "MyHazel/vendor/Glad/include"
+IncludeDir["ImGui"] = "MyHazel/vendor/imgui"
 
 include "MyHazel/vendor/GLFW"												--copy premake5 file in this dir;
 include "MyHazel/vendor/Glad"
+include "MyHazel/vendor/imgui"
 
 project "MyHazel"
 	location "MyHazel"
@@ -41,6 +43,7 @@ project "MyHazel"
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.Glad}"
 	}
 
@@ -48,6 +51,7 @@ project "MyHazel"
 	{
 		"GLFW",
 		"Glad",
+		"ImGui",
 		"opengl32.lib"
 	}
 
