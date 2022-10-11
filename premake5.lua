@@ -16,6 +16,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "MyHazel/vendor/GLFW/include"
 IncludeDir["Glad"] = "MyHazel/vendor/Glad/include"
 IncludeDir["ImGui"] = "MyHazel/vendor/imgui"
+IncludeDir["glm"] = "MyHazel/vendor/glm"
 
 include "MyHazel/vendor/GLFW"												--copy premake5 file in this dir;
 include "MyHazel/vendor/Glad"
@@ -36,7 +37,9 @@ project "MyHazel"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/glm/glm/**.hpp",
+		"%{prj.name}/vendor/glm/glm/**.inl"
 	}
 
 	includedirs
@@ -45,7 +48,8 @@ project "MyHazel"
 		"%{prj.name}/vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.Glad}"
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.glm}"
 	}
 
 	links
@@ -105,7 +109,8 @@ project "Sandbox"
 	includedirs
 	{
 		"MyHazel/vendor/spdlog/include",
-		"MyHazel/src"
+		"MyHazel/src",
+		"%{IncludeDir.glm}"
 	}
 
 	links
