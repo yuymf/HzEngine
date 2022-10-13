@@ -9,3 +9,4 @@ bin-int/
 *.vcxproj
 *.filters
 *.user
+*.int
