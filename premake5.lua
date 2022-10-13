@@ -18,9 +18,12 @@ IncludeDir["Glad"] = "MyHazel/vendor/Glad/include"
 IncludeDir["ImGui"] = "MyHazel/vendor/imgui"
 IncludeDir["glm"] = "MyHazel/vendor/glm"
 
-include "MyHazel/vendor/GLFW"												--copy premake5 file in this dir;
-include "MyHazel/vendor/Glad"
-include "MyHazel/vendor/imgui"
+group "Dependencies"
+	include "MyHazel/vendor/GLFW"
+	include "MyHazel/vendor/Glad"
+	include "MyHazel/vendor/imgui"
+
+group ""
 
 project "MyHazel"
 	location "MyHazel"
