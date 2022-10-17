@@ -22,8 +22,8 @@ public:
 
 	virtual void OnImGuiRender() override
 	{
-		ImGui::Begin("Test");
-		ImGui::Text("hello world");
+		ImGui::Begin("Check");
+		ImGui::Text("Yuymf: Testing");
 		ImGui::End();
 
 	}
