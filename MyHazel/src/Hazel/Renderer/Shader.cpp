@@ -3,6 +3,8 @@
 
 #include <glad/glad.h>
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace Hazel {
 
 	Shader::Shader(const std::string vertexSrc, const std::string fragmentSrc)
@@ -122,6 +124,16 @@ namespace Hazel {
 	void Shader::Unbind() const
 	{
 		glUseProgram(0);
+	}
+
+	void Shader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix)
+	{
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+		//location: uniform的位置。
+		//count : 需要加载数据的数组元素的数量或者需要修改的矩阵的数量。
+		//transpose : 指明矩阵是列优先(column major)矩阵（GL_FALSE）还是行优先(row major)矩阵（GL_TRUE）。
+		//value : 指向由count个元素的数组的指针。
 	}
 
 }
