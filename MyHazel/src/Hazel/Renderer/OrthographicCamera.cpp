@@ -12,7 +12,7 @@ namespace Hazel {
 
 	void OrthographicCarema::RecalculateViewMatrix()
 	{
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_Projection) *
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_Position) *
 			glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotation), glm::vec3(0.0f, 0.0f, 1.0f));    //Rotate by Z-axis
 
 		m_ViewMatrix = glm::inverse(transform);														//右逆矩阵；相机与物体运动为逆
