@@ -1,11 +1,12 @@
 #pragma once
 
 #include <string>
+#include "Hazel/Renderer/Shader.h"
 #include <glm/glm.hpp>
 
 namespace Hazel {
 
-	class OpenGLShader
+	class OpenGLShader : public Shader
 	{
 	public:
 		OpenGLShader(const std::string vertexSrc, const std::string fragmentSrc);
