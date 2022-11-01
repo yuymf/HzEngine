@@ -9,6 +9,11 @@ workspace "MyHazel"
 		"Dist"
 	}
 	
+	flags
+	{
+		"MultiProcessorCompile"
+	}
+
 	outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 --include directories relatave to root folders

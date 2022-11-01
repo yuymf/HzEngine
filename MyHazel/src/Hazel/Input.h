@@ -6,7 +6,13 @@ namespace Hazel {
 
 	class HAZEL_API Input
 	{
+	//a singleton
+	protected:
+		Input() = default;
 	public:
+		Input(const Input&) = delete;
+		Input& operator=(const Input&) = delete;
+
 		static bool IsKeyPressed(int keycode) { return s_Instance->IsKeyPressedImpl(keycode); }
 		static bool IsMouseButtonPressed(int button) { return s_Instance->IsMouseButtonPressedImpl(button); }
 		static std::pair<float, float> GetMousePos() { return s_Instance->GetMousePosImpl(); }
