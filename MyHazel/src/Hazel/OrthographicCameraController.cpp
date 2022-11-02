@@ -59,6 +59,8 @@ namespace Hazel {
 
 	bool OrthographicCameraController::OnWindowResized(WindowResizeEvent& e)
 	{
+		//增加视口以后，width变化，物体大小不变
+		//（width与lr正比：窗口变窄，物体增大->不变；height与bt反比：窗口变矮，物体缩小->更小）
 		m_AspectRadio = (float)e.GetWidth() / (float)e.GetHeight();
 		m_Camera.SetProjection(-m_AspectRadio * m_ZoomLevel, m_AspectRadio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
 		return false;
