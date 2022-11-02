@@ -1,14 +1,13 @@
 ﻿#include "hzpch.h"															//every cpp files need to include pch!
 #include "Application.h"
 
-#include "Hazel/Events/ApplicationEvent.h"
-#include "Hazel/Log.h"
-
-#include <GLFW/glfw3.h>
+#include "Hazel/Core/Log.h"
 
 #include "Hazel/Renderer/Renderer.h"
 
 #include "Input.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Hazel {
 
