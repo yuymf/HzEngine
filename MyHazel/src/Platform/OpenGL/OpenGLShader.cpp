@@ -85,9 +85,10 @@ namespace Hazel {
 			HZ_CORE_ASSERT(type == "vertex" || type == "fragment" || type == "pixel", "Invalid shader type specified!");
 
 			size_t nextLinePos = source.find_first_not_of("\r\n", eol);	//position# in "#version";
-			pos = source.find(typeToken, nextLinePos);								
+			HZ_CORE_ASSERT(nextLinePos != std::string::npos, "Syntax error");
+			pos = source.find(typeToken, nextLinePos);					//Start of next shader type declaration line
 			shaderSources[ShaderTypeFromString(type)] = source.substr(nextLinePos,
-				pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos));    //font: "#version" -> fileend; later: "#version" -> next"#type"
+				pos - (pos == std::string::npos ? source.size() - 1 : nextLinePos));    //font: "#version" -> fileend; later: "#version" -> next"#type"
 		}
 
 		return shaderSources;
@@ -97,7 +98,7 @@ namespace Hazel {
 	{
 
 		GLuint program = glCreateProgram();
-		HZ_CORE_ASSERT(shadersource.size() <= 2, "Only Suppport 2 shaders now")
+		HZ_CORE_ASSERT(shaderSources.size() <= 2, "Only Suppport 2 shaders now")
 		std::array<GLenum, 2> glShaderIDs;
 		int glShaderIDIndex = 0;
 
@@ -138,6 +139,8 @@ namespace Hazel {
 			glShaderIDs[glShaderIDIndex] = shader;
 		}
 
+		m_RendererID = program;
+
 		// Link our program
 		glLinkProgram(program);
 
@@ -157,9 +160,7 @@ namespace Hazel {
 			glDeleteProgram(program);
 			// Don't leak shaders either.
 			for (auto id : glShaderIDs)
-			{
 				glDeleteShader(id);
-			}
 
 			HZ_CORE_ERROR("{0}", infoLog.data());
 			HZ_CORE_ASSERT(false, "Shader link failure!");
@@ -170,9 +171,9 @@ namespace Hazel {
 		for (auto id : glShaderIDs)
 		{
 			glDetachShader(program, id);
+			glDeleteShader(id);
 		}
 
-		m_RendererID = program;
 	}
 
 	void OpenGLShader::Bind() const
