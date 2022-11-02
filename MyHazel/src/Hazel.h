@@ -10,6 +10,7 @@
 #include "Hazel/Layer.h"
 #include "Hazel/Log.h"
 #include "Hazel/ImGui/ImGuiLayer.h"
+#include "Hazel/OrthographicCameraController.h"
 
 // ---Renderer------------------------- 
 #include "Hazel/Renderer/Renderer.h"
@@ -21,6 +22,7 @@
 #include "Hazel/Renderer/VertexArray.h"
 
 #include "Hazel/Renderer/OrthographicCamera.h"
+
 // ------------------------------------ 
 
 // ---Entry Point---------------------- 
