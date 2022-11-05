@@ -1,11 +1,11 @@
 ﻿#include "hzpch.h"															//every cpp files need to include pch!
-#include "Application.h"
+#include "Hazel/Core/Application.h"
 
 #include "Hazel/Core/Log.h"
 
 #include "Hazel/Renderer/Renderer.h"
 
-#include "Input.h"
+#include "Hazel/Core/Input.h"
 
 #include <GLFW/glfw3.h>
 
