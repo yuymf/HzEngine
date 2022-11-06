@@ -11,8 +11,6 @@
 
 namespace Hazel {
 
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
-
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application()
@@ -20,8 +18,8 @@ namespace Hazel {
 		HZ_CORE_ASSERT(!s_Instance, "Application already exists");
 		s_Instance = this;
 
-		m_Window = Scope<Window>(Window::Create());
-		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+		m_Window = Window::Create();
+		m_Window->SetEventCallback(HZ_BIND_EVENT_FN(Application::OnEvent));
 
 		//m_Window->SetVSync(false);
 		 
@@ -30,6 +28,11 @@ namespace Hazel {
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverLay(m_ImGuiLayer);
 
+	}
+
+	Application::~Application()
+	{
+		Renderer::Shutdown();
 	}
 
 	void Application::PushLayer(Layer* Layer)
@@ -45,8 +48,8 @@ namespace Hazel {
 	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowsClose));
-		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowsResize));
+		dispatcher.Dispatch<WindowCloseEvent>(HZ_BIND_EVENT_FN(Application::OnWindowsClose));
+		dispatcher.Dispatch<WindowResizeEvent>(HZ_BIND_EVENT_FN(Application::OnWindowsResize));
 
 		//HZ_CORE_TRACE("{0}", e);
 

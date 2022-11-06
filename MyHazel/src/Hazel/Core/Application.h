@@ -15,11 +15,11 @@
 
 namespace Hazel {
 
-	class HAZEL_API Application
+	class Application
 	{
 	public:
 		Application();
-		virtual ~Application() = default;
+		virtual ~Application();
 
 		void Run();
 
@@ -48,5 +48,4 @@ namespace Hazel {
 
 	//To define in client;
 	Application* CreateApplication();
-
 }

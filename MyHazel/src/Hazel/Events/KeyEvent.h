@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Event.h"
+#include "Hazel/Events/Event.h"
 
 namespace Hazel {
 
-	class HAZEL_API KeyEvent : public Event
+	class KeyEvent : public Event
 	{
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
