@@ -56,11 +56,19 @@ namespace Hazel {
 
 		if (in)
 		{
-			in.seekg(0, std::ios::end);         //pointer to the file end;
-			result.resize(in.tellg());			//get the pointer,resize the result;
-			in.seekg(0, std::ios::beg);
-			in.read(&result[0], result.size());
-			in.close();
+			in.seekg(0, std::ios::end);         //pointer to the file end;		
+			size_t size = in.tellg();			//get the pointer,resize the result;
+			if (size != -1)
+			{
+				result.resize(size);
+				in.seekg(0, std::ios::beg);
+				in.read(&result[0], size);
+				in.close();
+			}
+			else
+			{
+				HZ_CORE_ERROR("Could not read from file '{0}'", filepath);
+			}
 		}
 		else
 		{
