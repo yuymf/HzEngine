@@ -13,6 +13,8 @@
 
 #include "Hazel/ImGui/ImGuiLayer.h"
 
+int main(int argc, char** argv);
+
 namespace Hazel {
 
 	class Application
@@ -20,8 +22,6 @@ namespace Hazel {
 	public:
 		Application();
 		virtual ~Application();
-
-		void Run();
 
 		void OnEvent(Event& e);
 
@@ -32,6 +32,7 @@ namespace Hazel {
 		inline Window& GetWindow() { return *m_Window; }
 
 	private:
+		void Run();
 		bool OnWindowsClose(WindowCloseEvent& e);
 		bool OnWindowsResize(WindowResizeEvent& e);
 
@@ -41,8 +42,10 @@ namespace Hazel {
 		bool m_Minimized = false;
 		LayerStack m_Layerstack;
 
-		static Application* s_Instance;
 		float m_LastFrameTime = 0.0f;
+
+		static Application* s_Instance;
+		friend int ::main(int argc, char** argv);
 
 	};
 
