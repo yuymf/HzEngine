@@ -5,6 +5,7 @@ bin-int/
 
 # Hazel files
 *.log
+*.json
 
 # Visual Studio files and folder
 .vs/
