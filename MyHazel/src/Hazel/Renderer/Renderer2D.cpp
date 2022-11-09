@@ -17,7 +17,7 @@ namespace Hazel {
 		// TODO: texid
 	};
 
-	struct Renderer2DStorage
+	struct Renderer2DData
 	{
 		const uint32_t MaxQuads = 10000;
 		const uint32_t MaxVertices = MaxQuads * 4;
@@ -33,7 +33,7 @@ namespace Hazel {
 		QuadVertex* QuadVertexBufferPtr = nullptr;
 	};
 	
-	static Renderer2DStorage s_Data;
+	static Renderer2DData s_Data;
 
 	void Renderer2D::Init()
 	{
@@ -57,7 +57,7 @@ namespace Hazel {
 		uint32_t offset = 0;
 		for (uint32_t i = 0; i < s_Data.MaxIndices; i += 6)
 		{
-			quadIndices[i]     = offset + 0;
+			quadIndices[i + 0] = offset + 0;
 			quadIndices[i + 1] = offset + 1;
 			quadIndices[i + 2] = offset + 2;
 			quadIndices[i + 3] = offset + 2;
@@ -131,17 +131,17 @@ namespace Hazel {
 		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
 		s_Data.QuadVertexBufferPtr++;
 
-		s_Data.QuadVertexBufferPtr->Position = { position.x + size, position.y, 0.0f };
+		s_Data.QuadVertexBufferPtr->Position = { position.x + size.x, position.y, 0.0f };
 		s_Data.QuadVertexBufferPtr->Color = color;
 		s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
 		s_Data.QuadVertexBufferPtr++;
 
-		s_Data.QuadVertexBufferPtr->Position = { position.x + size, position.y + size, 0.0f };
+		s_Data.QuadVertexBufferPtr->Position = { position.x + size.x, position.y + size.y, 0.0f };
 		s_Data.QuadVertexBufferPtr->Color = color;
 		s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
 		s_Data.QuadVertexBufferPtr++;
 
-		s_Data.QuadVertexBufferPtr->Position = { position.x, position.y + size, 0.0f };
+		s_Data.QuadVertexBufferPtr->Position = { position.x, position.y + size.y, 0.0f };
 		s_Data.QuadVertexBufferPtr->Color = color;
 		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
 		s_Data.QuadVertexBufferPtr++;

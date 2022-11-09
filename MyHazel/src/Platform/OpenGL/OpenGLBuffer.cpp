@@ -23,6 +23,9 @@ namespace Hazel {
 		HZ_PROFILE_FUNCTION();
 
 		glGenBuffers(1, &m_RendererID);
+
+		// GL_ELEMENT_ARRAY_BUFFER is not valid without an actively bound VAO
+		// Binding with GL_ARRAY_BUFFER allows the data to be loaded regardless of VAO state. 
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
 	}

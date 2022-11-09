@@ -53,7 +53,7 @@ namespace Hazel {
 		{
 			HZ_PROFILE_SCOPE("glfwInit");
 			int success = glfwInit();
-			HZ_CORE_ASSERT(success, "Cound not intialize GLFW");
+			HZ_CORE_ASSERT(success, "Cound not initialize GLFW");
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
 
