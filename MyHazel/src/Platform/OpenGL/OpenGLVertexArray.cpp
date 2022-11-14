@@ -67,14 +67,49 @@ namespace Hazel {
 		const auto& layout = vertexBuffer->GetLayout();
 		for (const auto& element : layout)
 		{
-			glEnableVertexAttribArray(m_VertexBufferIndex);
-			glVertexAttribPointer(m_VertexBufferIndex,										//0
-				element.GetCompenentCount(),					//3
-				ShaderDataTypeToOpenGLBaseType(element.Type),	//GL_FLOAT
-				element.Nomalized ? GL_TRUE : GL_FALSE,			//GL_FALSE
-				layout.GetStride(),								//3=4 * size0f(float)
-				(const void*)element.Offset);			//pointer* 0, intptr_t depends on platform;
-			m_VertexBufferIndex++;
+			switch (element.Type)
+			{
+				case ShaderDataType::Float:
+				case ShaderDataType::Float2:
+				case ShaderDataType::Float3:
+				case ShaderDataType::Float4:
+				case ShaderDataType::Int:
+				case ShaderDataType::Int2:
+				case ShaderDataType::Int3:
+				case ShaderDataType::Int4:
+				case ShaderDataType::Bool:
+				{
+					glEnableVertexAttribArray(m_VertexBufferIndex);
+					glVertexAttribPointer(m_VertexBufferIndex,					//0
+						element.GetComponentCount(),							//3
+						ShaderDataTypeToOpenGLBaseType(element.Type),			//GL_FLOAT
+						element.Normalized ? GL_TRUE : GL_FALSE,				//GL_FALSE
+						layout.GetStride(),										//3=4 * size0f(float)
+						(const void*)element.Offset);							//pointer* 0, intptr_t depends on platform;
+					m_VertexBufferIndex++;
+					break;
+				}
+				case ShaderDataType::Mat3:
+				case ShaderDataType::Mat4:
+				{
+					uint8_t count = element.GetComponentCount();
+					for (uint8_t i = 0; i < count; i++)
+					{
+						glEnableVertexAttribArray(m_VertexBufferIndex);
+						glVertexAttribPointer(m_VertexBufferIndex,				//0
+							count,												//3
+							ShaderDataTypeToOpenGLBaseType(element.Type),		//GL_FLOAT
+							element.Normalized ? GL_TRUE : GL_FALSE,			//GL_FALSE
+							layout.GetStride(),									//3=4 * size0f(float)
+							(const void*)(sizeof(float) * count * i));			//pointer* 0, intptr_t depends on platform;
+						m_VertexBufferIndex++;
+						glVertexAttribDivisor(m_VertexBufferIndex, 1);          //¶àÊµÀýäÖÈ¾
+					}
+					break;
+				}
+				default:
+					HZ_CORE_ASSERT(false, "Unknown ShaderDataType!");
+			}
 		}
 
 		m_VertexBuffers.push_back(vertexBuffer);

@@ -61,7 +61,7 @@ namespace Hazel {
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 	{
 		//glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-		uint32_t count = indexCount ? vertexArray->GetIndexBuffer()->GetCount() : indexCount;    // all 60000 : part 12
+		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();    //  part 12 : all 6 * 10000
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 
 		//UnBind

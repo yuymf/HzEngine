@@ -1,7 +1,7 @@
 #pragma once
 #include "hzpch.h"
 
-#include "Hazel/Core/Core.h"
+#include "Hazel/Core/Base.h"
 #include "Hazel/Events/Event.h"
 
 // Notice to //DwmExtendFrameIntoClientArea(hWnd, &margins) in win32_window.c !!!!!!!

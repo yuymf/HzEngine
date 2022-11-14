@@ -34,16 +34,16 @@ namespace Hazel {
 		std::string Name;
 		uint32_t Size;
 		size_t Offset;
-		bool Nomalized;
+		bool Normalized;
 
 		BufferElement() = default;
 
 		BufferElement(ShaderDataType type, std::string name, bool nomalized = false)
-			: Type(type), Name(name), Size(ShaderDataTypeSize(type)), Offset(0), Nomalized(nomalized)
+			: Type(type), Name(name), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(nomalized)
 		{
 		}
 
-		uint32_t GetCompenentCount() const
+		uint32_t GetComponentCount() const
 		{
 			switch (Type)
 			{
@@ -51,8 +51,8 @@ namespace Hazel {
 				case ShaderDataType::Float2:  return 2;
 				case ShaderDataType::Float3:  return 3;
 				case ShaderDataType::Float4:  return 4;
-				case ShaderDataType::Mat3:    return 3 * 3;
-				case ShaderDataType::Mat4:    return 4 * 4;
+				case ShaderDataType::Mat3:    return 3; // 3* float3
+				case ShaderDataType::Mat4:    return 4; // 4* float4
 				case ShaderDataType::Int:     return 1;
 				case ShaderDataType::Int2:    return 2;
 				case ShaderDataType::Int3:    return 3;
@@ -93,7 +93,6 @@ namespace Hazel {
 				element.Offset = offset;
 				offset += element.Size;
 				m_Stride += element.Size;
-
 			}
 		}
 

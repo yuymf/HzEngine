@@ -68,9 +68,10 @@ namespace Hazel {
 		//handle from top
 		for (auto it = m_Layerstack.rbegin(); it != m_Layerstack.rend(); ++it)
 		{
-			(*it)->OnEvent(e);
+			//Imgui handling mouseand keyboards events
 			if (e.Handled)
 				break;
+			(*it)->OnEvent(e);
 		}
 	}
 
@@ -80,7 +81,7 @@ namespace Hazel {
 
 		while (m_Running)
 		{
-			HZ_PROFILE_FUNCTION("RunLoop");
+			HZ_PROFILE_SCOPE("RunLoop");
 
 			float time = (float)glfwGetTime();
 			Timestep timestep = time - m_LastFrameTime;
@@ -89,7 +90,7 @@ namespace Hazel {
 			if (!m_Minimized)
 			{
 				{
-					HZ_PROFILE_FUNCTION("LayerStack OnUpdate");
+					HZ_PROFILE_SCOPE("LayerStack OnUpdate");
 
 					for (Layer* layer : m_Layerstack)
 						layer->OnUpdate(timestep);
@@ -98,7 +99,7 @@ namespace Hazel {
 
 				m_ImGuiLayer->Begin();
 				{
-					HZ_PROFILE_FUNCTION("LayerStack OnUpdate");
+					HZ_PROFILE_SCOPE("LayerStack OnUpdate");
 
 					for (Layer* layer : m_Layerstack)
 						layer->OnImGuiRender();
