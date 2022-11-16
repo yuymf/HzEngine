@@ -32,6 +32,16 @@ namespace Hazel {
 	void EditorLayer::OnUpdate(Hazel::Timestep ts)
 	{
 		HZ_PROFILE_FUNCTION();
+
+		// Resize
+		if (Hazel::FramebufferSpecification spec = m_Framebuffer->GetSpecification();
+			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
+			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
+		{
+			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+		}
+
 		// Update
 		if (m_ViewportFocused)					//鼠标不点击Viewport，wasd无效
 			m_CameraController.OnUpdate(ts);
@@ -164,13 +174,8 @@ namespace Hazel {
 		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
 		ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
-		if (m_ViewportSize != *(glm::vec2*)&ViewportPanelSize)
-		{
-			m_Framebuffer->Resize((uint32_t)ViewportPanelSize.x, (uint32_t)ViewportPanelSize. y);
-			m_ViewportSize = { ViewportPanelSize.x, ViewportPanelSize.y };
 
-			m_CameraController.OnResize(ViewportPanelSize.x, ViewportPanelSize.y);
-		}
+		m_ViewportSize = { ViewportPanelSize.x, ViewportPanelSize.y };
 
 		uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
 		ImGui::Image((void*)textureID, ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
