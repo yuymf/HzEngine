@@ -39,7 +39,7 @@ namespace Hazel {
 	{
 		friend class EventDispatcher;
 	public:
-		//virtual ~Event() = default;
+		virtual ~Event() = default;
 
 		bool Handled = false;
 
