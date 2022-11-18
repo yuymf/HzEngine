@@ -1,7 +1,10 @@
 #include "hzpch.h"
 #include "Hazel/Scene/Scene.h"
+#include "Hazel/Scene/Entity.h"
 #include "Components.h"
 #include "Hazel/Renderer/Renderer2D.h"
+
+#include <glm/glm.hpp>
 
 namespace Hazel {
 
@@ -54,9 +57,13 @@ namespace Hazel {
 
 	}
 
-	entt::entity Scene::CreateEntity()
+	Entity Scene::CreateEntity(const std::string& name)
 	{
-		return m_Registry.create();
+		Entity entity = { m_Registry.create(), this };
+		entity.AddComponent<TransformComponent>();
+		auto& tag = entity.AddComponent<TagComponent>();
+		tag.Tag = name.empty() ? "Entity" : name;
+		return entity;
 	}
 
 	void Scene::OnUpdate(Timestep ts)

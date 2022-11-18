@@ -67,7 +67,9 @@
 
 #define BIT(x) (1 << x)
 
-#define HZ_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+// #define HZ_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+// 1. this->fn(rvalues) 2. decltype: distill the type of "auto" 
+#define HZ_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
 // * -> Scope or Ref
 // new T(arg) -> CreateScope<T>(arg) or CreateScope<T>(arg)

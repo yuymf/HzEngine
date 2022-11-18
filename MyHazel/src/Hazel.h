@@ -12,9 +12,11 @@
 #include "Hazel/Core/Layer.h"
 #include "Hazel/Core/Log.h"
 #include "Hazel/Renderer/OrthographicCameraController.h"
+
 #include "Hazel/ImGui/ImGuiLayer.h"
 
 #include "Hazel/Scene/Scene.h"
+#include "Hazel/Scene/Entity.h"
 #include "Hazel/Scene/Components.h"
 
 // ---Renderer------------------------- 
