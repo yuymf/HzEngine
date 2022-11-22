@@ -101,6 +101,7 @@ namespace Hazel {
 		//set all slot to 0;
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
+		// Origin quad O = 1*1; POSTION = (P * V * M * O)
 		s_Data.QuadVertexPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPositions[1] = { 0.5f, -0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPositions[2] = { 0.5f,  0.5f, 0.0f, 1.0f };

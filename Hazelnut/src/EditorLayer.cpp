@@ -40,6 +40,36 @@ namespace Hazel {
 		auto& cc = m_SecondCamera.AddComponent<CameraComponent>();
 		cc.Primary = false;
 		//----------------------
+
+		// Script
+		class CameraControll : public ScriptableEntity
+		{
+		public:
+			void OnCreate()
+			{
+			}
+
+			void OnDestroy()
+			{
+			}
+
+			void OnUpdate(Timestep ts)
+			{
+				auto& transform = GetComponent<TransformComponent>().Transform;
+				float speed = 5.0f;
+
+				if (Input::IsKeyPressed(HZ_KEY_A))
+					transform[3][0] -= speed * ts; //[3]:第四列（tx，ty，tz，1）表示位移
+				if (Input::IsKeyPressed(HZ_KEY_D))
+					transform[3][0] += speed * ts;
+				if (Input::IsKeyPressed(HZ_KEY_W))
+					transform[3][1] += speed * ts;
+				if (Input::IsKeyPressed(HZ_KEY_S))
+					transform[3][1] -= speed * ts;
+			}
+		};
+
+		m_PrimaryCamera.AddComponent<NativeScriptComponent>().Bind<CameraControll>();
 	}
 
 	void EditorLayer::OnDetach()
@@ -164,7 +194,9 @@ namespace Hazel {
 			ImGui::Separator();
 		}
 
+		// Change: glm::inverse(transform) -> View -> u_ViewProjection
 		ImGui::DragFloat3("Camera Transform", glm::value_ptr(m_PrimaryCamera.GetComponent<TransformComponent>().Transform[3]));
+		// Q: Why only -1 <= tz < 1, Qual shows up? A: 2D
 
 		if (ImGui::Checkbox("Camera A", &m_CameraPrim))
 		{
@@ -173,7 +205,8 @@ namespace Hazel {
 		}
 
 		{
-			auto& camera = m_SecondCamera.GetComponent<CameraComponent>().Camera;
+			// Change：camera.GetProjection() -> Proj -> u_ViewProjection
+			auto& camera = m_PrimaryCamera.GetComponent<CameraComponent>().Camera;
 			float orthoSize = camera.GetOrthographicSize();
 			if (ImGui::DragFloat("Second Camera Ortho Size", &orthoSize))
 				camera.SetOrthographicSize(orthoSize);
