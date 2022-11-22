@@ -27,6 +27,10 @@ namespace Hazel {
 		Ref<Scene> m_ActiveScene;
 		Entity m_SquareEntity;
 
+		Entity m_PrimaryCamera;
+		Entity m_SecondCamera;
+		bool m_CameraPrim = true;
+
 		Ref<Texture2D> m_CheckerboardTexture;
 
 		bool m_ViewportFocused = false, m_ViewportHovered = false;

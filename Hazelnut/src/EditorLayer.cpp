@@ -25,11 +25,20 @@ namespace Hazel {
 
 		m_ActiveScene = CreateRef<Scene>();
 
-		//1.square-------------
+		//1.square entity-------------
 		auto square = m_ActiveScene->CreateEntity("Green Square");
 		square.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 
 		m_SquareEntity = square;
+		//----------------------
+
+		//2.camera entity-------------
+		m_PrimaryCamera = m_ActiveScene->CreateEntity("Primary Camera");
+		m_PrimaryCamera.AddComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+
+		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
+		auto& cc = m_SecondCamera.AddComponent<CameraComponent>(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
+		cc.Primary = false;
 		//----------------------
 	}
 
@@ -61,12 +70,9 @@ namespace Hazel {
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		RenderCommand::Clear();
 
-		Renderer2D::BeginScene(m_CameraController.GetCamera());
-
 		// Update Scene
 		m_ActiveScene->OnUpdate(ts);
 
-		Renderer2D::EndScene();
 		m_Framebuffer->Unbind();
 
 	}
@@ -156,8 +162,17 @@ namespace Hazel {
 			ImGui::Separator();
 		}
 
+		ImGui::DragFloat3("Camera Transform", glm::value_ptr(m_PrimaryCamera.GetComponent<TransformComponent>().Transform[3]));
+
+		if (ImGui::Checkbox("Camera A", &m_CameraPrim))
+		{
+			m_PrimaryCamera.GetComponent<CameraComponent>().Primary = m_CameraPrim;
+			m_SecondCamera.GetComponent<CameraComponent>().Primary = !m_CameraPrim;
+		}
+
 		ImGui::End();
 
+		// Viewport
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport");
 
