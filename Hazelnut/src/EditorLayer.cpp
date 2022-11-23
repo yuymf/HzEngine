@@ -45,15 +45,17 @@ namespace Hazel {
 		class CameraControll : public ScriptableEntity
 		{
 		public:
-			void OnCreate()
+			void OnCreate() override
+			{
+				auto& transform = GetComponent<TransformComponent>().Transform;
+				transform[3][0] = rand() % 10 - 5.0f;
+			}
+
+			void OnDestroy() override
 			{
 			}
 
-			void OnDestroy()
-			{
-			}
-
-			void OnUpdate(Timestep ts)
+			void OnUpdate(Timestep ts) override
 			{
 				auto& transform = GetComponent<TransformComponent>().Transform;
 				float speed = 5.0f;
@@ -70,6 +72,7 @@ namespace Hazel {
 		};
 
 		m_PrimaryCamera.AddComponent<NativeScriptComponent>().Bind<CameraControll>();
+		m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraControll>();
 	}
 
 	void EditorLayer::OnDetach()
