@@ -45,17 +45,17 @@ namespace Hazel {
 		class CameraControll : public ScriptableEntity
 		{
 		public:
-			void OnCreate() override
+			virtual void OnCreate() override
 			{
 				auto& transform = GetComponent<TransformComponent>().Transform;
 				transform[3][0] = rand() % 10 - 5.0f;
 			}
 
-			void OnDestroy() override
+			virtual void OnDestroy() override
 			{
 			}
 
-			void OnUpdate(Timestep ts) override
+			virtual void OnUpdate(Timestep ts) override
 			{
 				auto& transform = GetComponent<TransformComponent>().Transform;
 				float speed = 5.0f;
