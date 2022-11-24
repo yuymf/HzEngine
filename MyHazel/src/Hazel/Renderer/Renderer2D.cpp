@@ -61,7 +61,7 @@ namespace Hazel {
 			});
 		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
-		s_Data.QuadVertexBufferBase = new QuadVertex[s_Data.MaxVertices] ;
+		s_Data.QuadVertexBufferBase = new QuadVertex[s_Data.MaxVertices];
 
 		uint32_t* quadIndices = new uint32_t[s_Data.MaxIndices];
 
@@ -116,7 +116,7 @@ namespace Hazel {
 	}
 
 
-	void Renderer2D::BeginScene(OrthographicCamera& camera)
+	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
 		HZ_PROFILE_FUNCTION();
 
@@ -129,7 +129,7 @@ namespace Hazel {
 		s_Data.TextureSlotIndex = 1;
 	}
 
-	void Renderer2D::BeginScene(Camera& camera, glm::mat4& transform)
+	void Renderer2D::BeginScene(const Camera& camera, glm::mat4& transform)
 	{
 		HZ_PROFILE_FUNCTION();
 
@@ -207,7 +207,7 @@ namespace Hazel {
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) *
 			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		DrawQuad(transform, texture, tilingFactor);
+		DrawQuad(transform, texture, tilingFactor, tintColor);
 	}
 
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
@@ -249,7 +249,7 @@ namespace Hazel {
 		constexpr size_t quadVertexCount = 4;
 		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
 
-		//textureÈôÒÑ¾­ÔÚslotÄÚ,TextureSlotIndex²»Ôö¼Ó
+		//textureï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½slotï¿½ï¿½,TextureSlotIndexï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		float textureIndex = 0.0f;
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
 		{

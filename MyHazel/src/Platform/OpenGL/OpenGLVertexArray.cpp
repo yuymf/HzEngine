@@ -9,17 +9,17 @@ namespace Hazel {
 	{
 		switch (type)
 		{
-		case Hazel::ShaderDataType::Float:    return GL_FLOAT;
-		case Hazel::ShaderDataType::Float2:   return GL_FLOAT;
-		case Hazel::ShaderDataType::Float3:   return GL_FLOAT;
-		case Hazel::ShaderDataType::Float4:   return GL_FLOAT;
-		case Hazel::ShaderDataType::Mat3:     return GL_FLOAT;
-		case Hazel::ShaderDataType::Mat4:     return GL_FLOAT;
-		case Hazel::ShaderDataType::Int:      return GL_INT;
-		case Hazel::ShaderDataType::Int2:     return GL_INT;
-		case Hazel::ShaderDataType::Int3:     return GL_INT;
-		case Hazel::ShaderDataType::Int4:     return GL_INT;
-		case Hazel::ShaderDataType::Bool:     return GL_BOOL;
+		case ShaderDataType::Float:    return GL_FLOAT;
+		case ShaderDataType::Float2:   return GL_FLOAT;
+		case ShaderDataType::Float3:   return GL_FLOAT;
+		case ShaderDataType::Float4:   return GL_FLOAT;
+		case ShaderDataType::Mat3:     return GL_FLOAT;
+		case ShaderDataType::Mat4:     return GL_FLOAT;
+		case ShaderDataType::Int:      return GL_INT;
+		case ShaderDataType::Int2:     return GL_INT;
+		case ShaderDataType::Int3:     return GL_INT;
+		case ShaderDataType::Int4:     return GL_INT;
+		case ShaderDataType::Bool:     return GL_BOOL;
 		}
 
 		HZ_CORE_ASSERT(false, "Unknown ShaderDataType!");
@@ -102,8 +102,8 @@ namespace Hazel {
 							element.Normalized ? GL_TRUE : GL_FALSE,			//GL_FALSE
 							layout.GetStride(),									//3=4 * size0f(float)
 							(const void*)(sizeof(float) * count * i));			//pointer* 0, intptr_t depends on platform;
-						m_VertexBufferIndex++;
 						glVertexAttribDivisor(m_VertexBufferIndex, 1);          //∂‡ µ¿˝‰÷»æ
+						m_VertexBufferIndex++;
 					}
 					break;
 				}

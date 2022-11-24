@@ -15,7 +15,7 @@ namespace Hazel {
 		if (type == "fragment" || type == "pixel")
 			return GL_FRAGMENT_SHADER;
 
-		HZ_CORE_ASSERT(false, "Unknown shader type!")
+		HZ_CORE_ASSERT(false, "Unknown shader type!");
 		return 0;
 	}
 
@@ -31,7 +31,7 @@ namespace Hazel {
 		auto lastSlash = filepath.find_last_of("/\\");
 		//Texture.glsl
 		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;    // +1 means behind"/"
-		auto lastDot = filepath.rfind(".");
+		auto lastDot = filepath.rfind('.');								   // '' not ""
 		//Texture
 		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash ;
 		m_Name = filepath.substr(lastSlash, count);
@@ -60,7 +60,7 @@ namespace Hazel {
 		HZ_PROFILE_FUNCTION();
 
 		std::string result;
-		std::ifstream in(filepath, std::ios::in | std::ios::binary);
+		std::ifstream in(filepath, std::ios::in | std::ios::binary); // ifstream closes itself due to RAII
 
 		if (in)
 		{
@@ -71,11 +71,11 @@ namespace Hazel {
 				result.resize(size);
 				in.seekg(0, std::ios::beg);
 				in.read(&result[0], size);
-				in.close();
+				//in.close();
 			}
 			else
 			{
-				HZ_CORE_ERROR("Could not read from file '{0}'", filepath);
+				HZ_CORE_ERROR("Could not read from file {0}", filepath);
 			}
 		}
 		else
@@ -156,7 +156,7 @@ namespace Hazel {
 
 			// Attach our shaders to our program
 			glAttachShader(program, shader);
-			glShaderIDs[glShaderIDIndex] = shader;
+			glShaderIDs[glShaderIDIndex++] = shader;
 		}
 
 		m_RendererID = program;
