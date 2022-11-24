@@ -36,10 +36,10 @@ namespace Hazel {
 		//----------------------
 
 		//2.camera entity-------------
-		m_PrimaryCamera = m_ActiveScene->CreateEntity("Primary Camera");
+		m_PrimaryCamera = m_ActiveScene->CreateEntity("Camera A");
 		m_PrimaryCamera.AddComponent<CameraComponent>();
 
-		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
+		m_SecondCamera = m_ActiveScene->CreateEntity("Camera B");
 		auto& cc = m_SecondCamera.AddComponent<CameraComponent>();
 		cc.Primary = false;
 		//----------------------
@@ -184,7 +184,7 @@ namespace Hazel {
 
 		m_SceneHierarchyPanel.OnImGuiRender();
 
-		ImGui::Begin("Settings");
+		ImGui::Begin("Stats");
 
 		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
@@ -192,35 +192,6 @@ namespace Hazel {
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-
-		if (m_SquareEntity)
-		{
-			ImGui::Separator();
-			auto& tag = m_SquareEntity.GetComponent<TagComponent>().Tag;
-			ImGui::Text("%s", tag.c_str());
-
-			auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
-			ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
-			ImGui::Separator();
-		}
-
-		// Change: glm::inverse(transform) -> View -> u_ViewProjection
-		ImGui::DragFloat3("Camera Transform", glm::value_ptr(m_PrimaryCamera.GetComponent<TransformComponent>().Transform[3]));
-		// Q: Why only -1 <= tz < 1, Qual shows up? A: 2D
-
-		if (ImGui::Checkbox("Camera A", &m_CameraPrim))
-		{
-			m_PrimaryCamera.GetComponent<CameraComponent>().Primary = m_CameraPrim;
-			m_SecondCamera.GetComponent<CameraComponent>().Primary = !m_CameraPrim;
-		}
-
-		{
-			// Change£ºcamera.GetProjection() -> Proj -> u_ViewProjection
-			auto& camera = m_PrimaryCamera.GetComponent<CameraComponent>().Camera;
-			float orthoSize = camera.GetOrthographicSize();
-			if (ImGui::DragFloat("Second Camera Ortho Size", &orthoSize))
-				camera.SetOrthographicSize(orthoSize);
-		}
 
 		ImGui::End();
 

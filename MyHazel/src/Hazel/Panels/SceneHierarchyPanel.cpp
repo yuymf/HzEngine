@@ -89,6 +89,7 @@ namespace Hazel {
 			if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
 			{
 				auto& transform = entity.GetComponent<TransformComponent>().Transform;
+				// Q: Why only -1 <= tz < 1, Qual shows up? A: ortho
 				ImGui::DragFloat3("Position", glm::value_ptr(transform[3]), 0.1f);
 				ImGui::TreePop();
 			}
@@ -160,7 +161,16 @@ namespace Hazel {
 
 				ImGui::TreePop();
 			}
+		}
 
+		if (entity.HasComponent<SpriteRendererComponent>())
+		{
+			if (ImGui::TreeNodeEx((void*)typeid(SpriteRendererComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Sprite Renderer"))
+			{
+				auto& src = entity.GetComponent<SpriteRendererComponent>();
+				ImGui::ColorEdit4("Color", glm::value_ptr(src.Color));
+				ImGui::TreePop();
+			}
 		}
 	}
 
