@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../Scene/Entity.h"
-#include "../Scene/Scene.h"
+#include "Hazel/Core/Base.h"
+#include "Hazel/Scene/Scene.h"
+#include "Hazel/Scene/Entity.h"
 
 namespace Hazel {
 
