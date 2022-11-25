@@ -98,7 +98,7 @@ namespace Hazel {
 		s_Data.TextureShader->Bind();
 		s_Data.TextureShader->SetIntArray("u_Textures", samples, s_Data.MaxTextureSlots);
 
-		//set all slot to 0;
+		//set first slot to 0;
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
 		// Origin quad O = 1*1; POSTION = (P * V * M * O)
@@ -253,7 +253,7 @@ namespace Hazel {
 		float textureIndex = 0.0f;
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
 		{
-			if (*s_Data.TextureSlots[i].get() == *texture.get())
+			if (*s_Data.TextureSlots[i] == *texture)
 			{
 				textureIndex = (float)i;
 				break;

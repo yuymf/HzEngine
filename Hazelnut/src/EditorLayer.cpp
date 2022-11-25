@@ -63,13 +63,13 @@ namespace Hazel {
 				auto& translation = GetComponent<TransformComponent>().Translation;
 				float speed = 5.0f;
 
-				if (Input::IsKeyPressed(HZ_KEY_A))
+				if (Input::IsKeyPressed(Key::A))
 					translation.x -= speed * ts; //[3]:第四列（tx，ty，tz，1）表示位移
-				if (Input::IsKeyPressed(HZ_KEY_D))
+				if (Input::IsKeyPressed(Key::D))
 					translation.x += speed * ts;
-				if (Input::IsKeyPressed(HZ_KEY_W))
+				if (Input::IsKeyPressed(Key::W))
 					translation.y += speed * ts;
-				if (Input::IsKeyPressed(HZ_KEY_S))
+				if (Input::IsKeyPressed(Key::S))
 					translation.y -= speed * ts;
 			}
 		};
@@ -208,8 +208,9 @@ namespace Hazel {
 
 		m_ViewportSize = { ViewportPanelSize.x, ViewportPanelSize.y };
 
-		uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
-		ImGui::Image((void*)textureID, ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+		// reinterpret_cast: cast pointer & value
+		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 		ImGui::End();
 
 		ImGui::PopStyleVar();

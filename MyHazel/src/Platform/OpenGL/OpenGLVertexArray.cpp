@@ -101,7 +101,7 @@ namespace Hazel {
 							ShaderDataTypeToOpenGLBaseType(element.Type),		//GL_FLOAT
 							element.Normalized ? GL_TRUE : GL_FALSE,			//GL_FALSE
 							layout.GetStride(),									//3=4 * size0f(float)
-							(const void*)(sizeof(float) * count * i));			//pointer* 0, intptr_t depends on platform;
+							(const void*)(element.Offset + sizeof(float) * count * i));			//pointer* 0, intptr_t depends on platform;
 						glVertexAttribDivisor(m_VertexBufferIndex, 1);          //∂‡ µ¿˝‰÷»æ
 						m_VertexBufferIndex++;
 					}
