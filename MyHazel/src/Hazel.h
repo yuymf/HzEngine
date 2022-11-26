@@ -11,6 +11,7 @@
 #include "Hazel/Core/MouseCodes.h"
 #include "Hazel/Core/Layer.h"
 #include "Hazel/Core/Log.h"
+#include "Hazel/Core/Assert.h"
 #include "Hazel/Renderer/OrthographicCameraController.h"
 
 #include "Hazel/ImGui/ImGuiLayer.h"
