@@ -5,6 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Hazel/Scene/SceneSerializer.h"
+
 namespace Hazel {
 	EditorLayer::EditorLayer()
 		: Layer("Example"), m_CameraController(1280.0f / 720.0f), m_SquareColor({ 0.2f, 0.3f, 0.8f, 1.0f })
@@ -25,6 +27,7 @@ namespace Hazel {
 
 		m_ActiveScene = CreateRef<Scene>();
 
+#if 0
 		//1.square entity-------------
 		auto square = m_ActiveScene->CreateEntity("Green Square");
 		square.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
@@ -76,6 +79,7 @@ namespace Hazel {
 
 		m_PrimaryCamera.AddComponent<NativeScriptComponent>().Bind<CameraControll>();
 		m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraControll>();
+#endif
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
@@ -182,6 +186,18 @@ namespace Hazel {
 				// Disabling fullscreen would allow the window to be moved to the front of other windows, 
 				// which we can't undo at the moment without finer window depth/z control.
 				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
+
+				if (ImGui::MenuItem("Serialize"))
+				{
+					SceneSerializer serializer(m_ActiveScene);
+					serializer.Serialize("assets/scenes/Example.hazel");
+				}
+
+				if (ImGui::MenuItem("DeSerialize"))
+				{
+					SceneSerializer serializer(m_ActiveScene);
+					serializer.DeSerialize("assets/scenes/Example.hazel");
+				}
 
 				if (ImGui::MenuItem("Exit")) Application::Get().Close();
 				ImGui::EndMenu();

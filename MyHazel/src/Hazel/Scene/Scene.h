@@ -31,6 +31,7 @@ namespace Hazel {
 
 		// friend class can use the privatemember
 		friend class Entity;
+		friend class SceneSerializer;
 		friend class SceneHierarchyPanel;
 	};
 

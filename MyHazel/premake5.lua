@@ -35,6 +35,7 @@ project "MyHazel"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.entt}"
 	}
 
@@ -43,6 +44,7 @@ project "MyHazel"
 		"GLFW",
 		"Glad",
 		"ImGui",
+		"yaml-cpp",
 		"opengl32.lib"
 	}
 
