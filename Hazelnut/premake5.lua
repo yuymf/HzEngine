@@ -19,7 +19,8 @@ project "Hazelnut"
 		"%{wks.location}/MyHazel/src",
 		"%{wks.location}/MyHazel/vendor",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.ImGuizmo}"
 	}
 
 	links

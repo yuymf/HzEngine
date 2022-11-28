@@ -17,7 +17,9 @@ project "MyHazel"
 		"vendor/stb_image/**.h",
 		"vendor/stb_image/**.cpp",
 		"vendor/glm/glm/**.hpp",
-		"vendor/glm/glm/**.inl"	
+		"vendor/glm/glm/**.inl",
+		"vendor/ImGuizmo/ImGuizmo.h",
+		"vendor/ImGuizmo/ImGuizmo.cpp"
 	}
 
 	defines
@@ -36,7 +38,8 @@ project "MyHazel"
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.yaml_cpp}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.ImGuizmo}"
 	}
 
 	links
@@ -47,6 +50,9 @@ project "MyHazel"
 		"yaml-cpp",
 		"opengl32.lib"
 	}
+
+	filter "files:vendor/ImGuizmo/**.cpp"
+	flags { "NoPCH" }
 
 	filter "system:windows"
 		systemversion "latest"

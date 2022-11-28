@@ -8,6 +8,9 @@
 #include "Hazel/Scene/SceneSerializer.h"
 #include "Hazel/Utils/PlatformUtils.h"
 
+#include "Hazel/Math/Math.h"
+#include <ImGuizmo.h>
+
 namespace Hazel {
 	EditorLayer::EditorLayer()
 		: Layer("Example"), m_CameraController(1280.0f / 720.0f), m_SquareColor({ 0.2f, 0.3f, 0.8f, 1.0f })
@@ -221,18 +224,63 @@ namespace Hazel {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport");
 
-		//鼠标悬停或点击才读取imgui的event
+		//当鼠标都没有悬停或点击时， block imgui的event
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
-		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
 		ImVec2 ViewportPanelSize = ImGui::GetContentRegionAvail();
 
 		m_ViewportSize = { ViewportPanelSize.x, ViewportPanelSize.y };
-
+		
 		uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
 		// reinterpret_cast: cast pointer & value
 		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+		Entity selectedEntity = m_SceneHierarchyPanel.GetSeletedEntity();
+		if (selectedEntity && m_GizmoType != -1)
+		{
+			ImGuizmo::SetOrthographic(false);
+			ImGuizmo::SetDrawlist();
+
+			float windowWidth = ImGui::GetWindowWidth();
+			float windowHeight = ImGui::GetWindowHeight();
+			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+			// camera
+			Entity cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+			const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+
+			const glm::mat4& cameraProjction = camera.GetProjection();
+			glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+			// selected Entity
+			auto& tc = selectedEntity.GetComponent<TransformComponent>();
+			glm::mat4 transform = tc.GetTransform();
+
+			// snapping
+			bool snap = Input::IsKeyPressed(Key::LeftControl);
+			float snapValue = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? 45.0f : 0.5;
+			float snapValues[3] = { snapValue, snapValue, snapValue };
+
+			//input: camera view&projection, entity transform
+			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjction),
+				(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL,
+				glm::value_ptr(transform), nullptr, snap ? snapValues : nullptr);
+
+			if (ImGuizmo::IsUsing())
+			{
+				glm::vec3 translation, rotation, scale;
+				Math::DeComposeTransform(transform, translation, rotation, scale);
+
+				// the change of transform back to selectedEntity
+				tc.Translation = translation;
+				glm::vec3 deltaRotation = rotation - tc.Rotation;
+				tc.Rotation += deltaRotation;
+				tc.Scale = scale;
+			}
+		}
+
 		ImGui::End();
 
 		ImGui::PopStyleVar();
@@ -279,6 +327,31 @@ namespace Hazel {
 				if (control && shift)
 					SaveSceneAs();
 
+				break;
+			}
+
+			// ImGuizmo
+			case Key::Q:
+			{
+				m_GizmoType = -1;
+				break;
+			}
+
+			case Key::W:
+			{
+				m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				break;
+			}
+
+			case Key::E:
+			{
+				m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+				break;
+			}
+
+			case Key::R:
+			{
+				m_GizmoType = ImGuizmo::OPERATION::SCALE;
 				break;
 			}
 		}
