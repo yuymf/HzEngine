@@ -2,6 +2,18 @@
 #include "Hazel/Panels/SceneHierarchyPanel.h"
 
 #include "Hazel/Scene/Components.h"
+
+#include <cstring>
+
+/* The Microsoft C++ compiler is non-compliant with the C++ standard and needs
+ * the following definition to disable a security warning on std::strncpy().
+ */
+#ifdef _MSVC_LANG
+	#ifndef _CRT_SECURE_NO_WARNINGS
+		#define _CRT_SECURE_NO_WARNINGS
+	#endif 
+#endif
+
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -17,6 +29,7 @@ namespace Hazel {
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& context)
 	{
 		m_Context = context;
+		m_SelectedContext = {};
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()
@@ -225,7 +238,10 @@ namespace Hazel {
 
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
-			strcpy_s(buffer, sizeof(buffer), tag.c_str());
+
+			// strcpy_s(buffer, sizeof(buffer), tag.c_str());
+			std::strncpy(buffer, tag.c_str(), sizeof(buffer));		// 可以把一个长度超过x的字符串数组复制并赋值给长度为x的字符串数组
+
 			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 			{
 				tag = std::string(buffer);
@@ -267,7 +283,12 @@ namespace Hazel {
 		DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
 		{
 			DrawVec3Control("Translation", component.Translation);
-			DrawVec3Control("Rotation", glm::degrees(component.Rotation));
+
+			glm::vec3 rotation = glm::degrees(component.Rotation);
+			DrawVec3Control("Rotation", rotation);
+			component.Rotation = glm::radians(rotation);
+			//DrawVec3Control("Rotation", glm::degrees(component.Rotation)); // comment this, or can`t change component initially
+
 			DrawVec3Control("Scale", component.Scale, 1.0f);
 		});
 
