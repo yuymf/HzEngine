@@ -4,6 +4,7 @@
 
 #include "Hazel/Renderer/Texture.h"
 #include "Hazel/Scene/Camera.h"
+#include "Hazel/Renderer/EditorCamera.h"
 
 namespace Hazel {
 
@@ -14,6 +15,7 @@ namespace Hazel {
 		static void Shutdown();
 
 		static void BeginScene(const OrthographicCamera& camera);
+		static void BeginScene(const EditorCamera& camera);
 		static void BeginScene(const Camera& camera, glm::mat4& transform);
 		static void EndScene();
 
