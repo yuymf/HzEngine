@@ -25,7 +25,7 @@ namespace Hazel {
 		m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 
 		FramebufferSpecification fbSpec;
-		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
+		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
 		fbSpec.Width = 1280;
 		fbSpec.Height = 720;
 		m_Framebuffer = Framebuffer::Create(fbSpec);
@@ -125,6 +125,20 @@ namespace Hazel {
 
 		// Update Scene
 		m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera); 		// m_ActiveScene->OnUpdateRuntime(ts);
+
+		auto [mx, my] = ImGui::GetMousePos();
+		mx -= m_ViewportBounds[0].x;
+		my -= m_ViewportBounds[0].y;			// 获取鼠标相对窗口位置[mx， my]
+		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];		// 窗口尺寸
+		my = m_ViewportSize.y - my;				// 上下颠倒
+		int mouseX = (int)mx;
+		int mouseY = (int)my;
+
+		if (mouseX >= 0 && mouseY >= 0 && mouseX <= (int)viewportSize.x && mouseY <= (int)viewportSize.y)
+		{
+			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+			HZ_CORE_WARN("Pixel data = {0}", pixelData);
+		}
 
 		m_Framebuffer->Unbind();
 
@@ -228,6 +242,7 @@ namespace Hazel {
 		// Viewport
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport");
+		auto viewportOffset = ImGui::GetCursorPos(); // Includes tab bar
 
 		//当鼠标都没有悬停或点击时， block imgui的event
 		m_ViewportFocused = ImGui::IsWindowFocused();
@@ -241,6 +256,16 @@ namespace Hazel {
 		uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
 		// reinterpret_cast: cast pointer & value
 		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+		// from window -> get viewportbound size 
+		auto windowSize = ImGui::GetWindowSize();
+		ImVec2 minBound = ImGui::GetWindowPos();
+		minBound.x += viewportOffset.x;
+		minBound.y += viewportOffset.y;			// 获取视口左上角
+
+		ImVec2 maxBound = { minBound.x + m_ViewportSize.x, minBound.y + m_ViewportSize.y};
+		m_ViewportBounds[0] = { minBound.x, minBound.y };
+		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
 
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSeletedEntity();
 		if (selectedEntity && m_GizmoType != -1)
