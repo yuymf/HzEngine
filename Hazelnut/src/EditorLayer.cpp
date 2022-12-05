@@ -140,7 +140,9 @@ namespace Hazel {
 		if (mouseX >= 0 && mouseY >= 0 && mouseX <= (int)viewportSize.x && mouseY <= (int)viewportSize.y)
 		{
 			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-			HZ_CORE_WARN("Pixel data = {0}", pixelData);
+			// HZ_CORE_WARN("Pixel data = {0}", pixelData);
+			// m_HoverEntity = pixelData == -1 ? entt::null : Entity((entt::entity)pixelData, m_ActiveScene.get());
+			m_HoverEntity = pixelData == -1 ? Entity(entt::null, m_ActiveScene.get()) : Entity((entt::entity)pixelData, m_ActiveScene.get());
 		}
 
 		m_Framebuffer->Unbind();
@@ -233,6 +235,11 @@ namespace Hazel {
 
 		ImGui::Begin("Stats");
 
+		std::string name = "None";
+		if (m_HoverEntity)
+			name = m_HoverEntity.GetComponent<TagComponent>().Tag;
+		ImGui::Text("Hovered Entity: %s", name.c_str());
+
 		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
 		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
@@ -245,7 +252,6 @@ namespace Hazel {
 		// Viewport
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport");
-		auto viewportOffset = ImGui::GetCursorPos(); // Includes tab bar
 
 		//当鼠标都没有悬停或点击时， block imgui的event
 		m_ViewportFocused = ImGui::IsWindowFocused();
@@ -261,14 +267,11 @@ namespace Hazel {
 		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 		// from window -> get viewportbound size 
-		auto windowSize = ImGui::GetWindowSize();
-		ImVec2 minBound = ImGui::GetWindowPos();
-		minBound.x += viewportOffset.x;
-		minBound.y += viewportOffset.y;			// 获取视口左上角
-
-		ImVec2 maxBound = { minBound.x + m_ViewportSize.x, minBound.y + m_ViewportSize.y};
-		m_ViewportBounds[0] = { minBound.x, minBound.y };
-		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
+		auto viewportOffset = ImGui::GetWindowPos(); // 获取视口左上角
+		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+		m_ViewportBounds[0] = {viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y};
+		m_ViewportBounds[1] = {viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y};
 
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSeletedEntity();
 		if (selectedEntity && m_GizmoType != -1)
@@ -276,9 +279,7 @@ namespace Hazel {
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
 
-			float windowWidth = ImGui::GetWindowWidth();
-			float windowHeight = ImGui::GetWindowHeight();
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+			ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y, m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y);
 
 			// camera
 
