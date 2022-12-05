@@ -299,7 +299,7 @@ namespace Hazel {
 
 			// snapping
 			bool snap = Input::IsKeyPressed(Key::LeftControl);
-			float snapValue = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? 45.0f : 0.5;
+			float snapValue = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? 45.0f : 0.5f;
 			float snapValues[3] = { snapValue, snapValue, snapValue };
 
 			//input: camera view&projection, entity transform
@@ -334,6 +334,7 @@ namespace Hazel {
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(HZ_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(HZ_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
@@ -400,6 +401,17 @@ namespace Hazel {
 				break;
 			}
 		}
+	}
+
+	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)
+	{
+		if (e.GetMouseButton() == Mouse::ButtonLeft)
+		{
+			if (m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt)) // 在视口悬浮，且不在qwe和alt中
+				m_SceneHierarchyPanel.SetSelectedEntity(m_HoverEntity);
+		}
+
+		return false;
 	}
 
 	void EditorLayer::NewScene()
