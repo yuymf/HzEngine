@@ -13,3 +13,8 @@ bin-int/
 **.vcxproj
 **.vcxproj.filters
 **.vcxproj.user
+
+# Directories
+MyHazel/vendor/VulkanSDK
+Hazelnut/assets/cache
+scripts/__pycache__

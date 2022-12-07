@@ -1,4 +1,5 @@
 include "./vendor/premake/premake_customization/solution_items.lua"
+include "Dependencies.lua"
 
 workspace "MyHazel"
 	architecture "x86_64"
@@ -22,17 +23,6 @@ workspace "MyHazel"
 	}
 
 	outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-
---include directories relatave to root folders
-IncludeDir = {}
-IncludeDir["GLFW"] = "%{wks.location}/MyHazel/vendor/GLFW/include"
-IncludeDir["Glad"] = "%{wks.location}/MyHazel/vendor/Glad/include"
-IncludeDir["ImGui"] = "%{wks.location}/MyHazel/vendor/imgui"
-IncludeDir["glm"] = "%{wks.location}/MyHazel/vendor/glm"
-IncludeDir["stb_image"] = "%{wks.location}/MyHazel/vendor/stb_image"
-IncludeDir["entt"] = "%{wks.location}/MyHazel/vendor/entt/include"
-IncludeDir["yaml_cpp"] = "%{wks.location}/MyHazel/vendor/yaml-cpp/include"
-IncludeDir["ImGuizmo"] = "%{wks.location}/MyHazel/vendor/ImGuizmo"
 
 group "Dependencies"
 	include "vendor/premake"

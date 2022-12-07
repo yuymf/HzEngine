@@ -8,10 +8,9 @@ namespace Hazel {
 	class Hazelnut : public Application
 	{
 	public:
-		Hazelnut()
-			: Application("WhyU Editor")
+		Hazelnut(ApplicationCommandLineArgs args)
+			: Application("WhyU Editor", args)
 		{
-			//PushLayer(new ExampleLayer());
 			PushLayer(new EditorLayer());
 		}
 
@@ -19,7 +18,7 @@ namespace Hazel {
 
 	};
 
-	Application* CreateApplication() {
-		return new Hazelnut();
+	Application* CreateApplication(ApplicationCommandLineArgs args) {
+		return new Hazelnut(args);
 	};
 }
