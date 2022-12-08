@@ -1,7 +1,7 @@
 #include "hzpch.h"
-#include "Hazel/Panels/SceneHierarchyPanel.h"
 
 #include "Hazel/Scene/Components.h"
+#include "SceneHierarchyPanel.h"
 
 #include <cstring>
 
@@ -14,8 +14,8 @@
 	#endif 
 #endif
 
-#include <imgui.h>
-#include <imgui_internal.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -34,13 +34,12 @@ namespace Hazel {
 
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
-		//1.Scene Hierarchy---------------------
+		//1.Scene Hierarchy-------------------------------
 		ImGui::Begin("Scene Hierarchy");
 
 		m_Context->m_Registry.each([&](auto entityID) 
 		{
 			Entity entity{ entityID, m_Context.get() };
-			// TODO
 			DrawEntityNode(entity);
 		});
 

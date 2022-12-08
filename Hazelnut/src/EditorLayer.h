@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Hazel.h"
-#include "Hazel/Panels/SceneHierarchyPanel.h"
 #include "Hazel/Renderer/EditorCamera.h"
+#include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ContentBrowserPanel.h"
 
 namespace Hazel {
 
@@ -57,6 +58,7 @@ namespace Hazel {
 
 		//Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
+		ContentBrowserPanel m_ContentBrowserPanel;
 	};
 
 }
