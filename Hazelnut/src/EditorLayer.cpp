@@ -142,15 +142,15 @@ namespace Hazel {
 		mx -= m_ViewportBounds[0].x;
 		my -= m_ViewportBounds[0].y;			// 获取鼠标相对窗口位置[mx， my]
 		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];		// 窗口尺寸
-		my = m_ViewportSize.y - my;				// 上下颠倒
+		my = viewportSize.y - my;				// 上下颠倒, m_ViewportSize = viewportSize;
 		int mouseX = (int)mx;
 		int mouseY = (int)my;
 
-		if (mouseX >= 0 && mouseY >= 0 && mouseX <= (int)viewportSize.x && mouseY <= (int)viewportSize.y)
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)			// no <= is <;
 		{
 			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
 			// HZ_CORE_WARN("Pixel data = {0}", pixelData);
-			// m_HoverEntity = pixelData == -1 ? entt::null : Entity((entt::entity)pixelData, m_ActiveScene.get());
+			// m_HoverEntity = pixelData == -1 ?  Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
 			m_HoverEntity = pixelData == -1 ? Entity(entt::null, m_ActiveScene.get()) : Entity((entt::entity)pixelData, m_ActiveScene.get());
 		}
 
@@ -275,6 +275,17 @@ namespace Hazel {
 		uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
 		// reinterpret_cast: cast pointer & value
 		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				OpenScene(path);
+			}
+
+			ImGui::EndDragDropTarget();
+		}
 
 		// from window -> get viewportbound size 
 		auto viewportOffset = ImGui::GetWindowPos(); // 获取视口左上角
@@ -437,13 +448,18 @@ namespace Hazel {
 		std::optional<std::string> filepath = FileDialogs::OpenFile("Hazel Scene (*.hazel)\0*.hazel\0");
 		if (filepath)
 		{
-			m_ActiveScene = CreateRef<Scene>();
-			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.DeSerialize(*filepath);
+			OpenScene(filepath.value());
 		}
+	}
+
+	void EditorLayer::OpenScene(const std::filesystem::path& path)
+	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.DeSerialize(path.string());
 	}
 
 	void EditorLayer::SaveSceneAs()
