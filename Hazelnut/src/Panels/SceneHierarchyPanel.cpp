@@ -63,7 +63,6 @@ namespace Hazel {
 		ImGui::Begin("Properties");
 		if (m_SelectedContext)
 		{
-			// TODO
 			DrawComponents(m_SelectedContext);
 		}
 		ImGui::End();
@@ -356,6 +355,21 @@ namespace Hazel {
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 		{
 			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+
+			ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				{
+					const wchar_t* path = (const wchar_t*)payload->Data;
+					component.Texture = Texture2D::Create(((std::filesystem::path)path).string());
+					//std::string path = *static_cast<std::string*>payload->Data;			//error
+
+					//component.Texture = Texture2D::Create(path);
+				}
+
+				ImGui::EndDragDropTarget();
+			}
 		});
 
 	}

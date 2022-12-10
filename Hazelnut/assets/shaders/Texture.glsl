@@ -19,11 +19,11 @@ struct VertexOutput
 {
 	vec4 Color;
 	vec2 TexCoord;
-	float TexIndex;
 	float TilingFactor;
 };
 
 layout(location = 0) out VertexOutput Output;
+layout(location = 3) flat out float v_TexIndex;
 layout(location = 4) flat out int v_EntityID; // https://stackoverflow.com/questions/27581271/flat-qualifier-in-glsl
 
 void main()
@@ -32,6 +32,7 @@ void main()
 	Output.TexCoord = a_TexCoord;
 	Output.TexIndex = a_TexIndex;
 	Output.TilingFactor = a_TilingFactor;
+	v_TexIndex = a_TexIndex;
 	v_EntityID = a_EntityID;
 	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 }
@@ -46,19 +47,19 @@ struct VertexOutput
 {
 	vec4 Color;
 	vec2 TexCoord;
-	float TexIndex;
 	float TilingFactor;
 };
 
-layout (location = 0) in VertexOutput Input;
-layout (location = 4) flat in int v_EntityID;
+layout(location = 0) in VertexOutput Input;
+layout(location = 3) flat in float v_TexIndex;
+layout(location = 4) flat in int v_EntityID;
 
 layout(binding = 0) uniform sampler2D u_Textures[32];
 
 void main()
 {
 	vec4 texColor = Input.Color;
-	switch(int(Input.TexIndex))
+	switch(int(v_TexIndex))
 	{
 		case  0: texColor *= texture(u_Textures[ 0], Input.TexCoord * Input.TilingFactor); break;
 		case  1: texColor *= texture(u_Textures[ 1], Input.TexCoord * Input.TilingFactor); break;
