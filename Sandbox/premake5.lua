@@ -2,7 +2,7 @@ project "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 
 	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
@@ -15,9 +15,9 @@ project "Sandbox"
 
 	includedirs
 	{
-		"%{wks.location/MyHazel/vendor/spdlog/include",
-		"%{wks.location/MyHazel/src",
-		"%{wks.location/MyHazel/vendor",
+		"%{wks.location}/MyHazel/vendor/spdlog/include",
+		"%{wks.location}/MyHazel/src",
+		"%{wks.location}/MyHazel/vendor",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}"
 	}

@@ -5,19 +5,24 @@
 
 #include "ExampleLayer.h"
 
-class Sandbox : public Hazel::Application
-{
-public:
-	Sandbox() 
+namespace Hazel {
+
+	class Sandbox : public Application
 	{
-		//PushLayer(new ExampleLayer());
-		PushLayer(new Sandbox2D());
-	}
+	public:
+		Sandbox(ApplicationCommandLineArgs args)
+			: Application("WhyU", args)
+		{
+			// PushLayer(new ExampleLayer());
+			PushLayer(new Sandbox2D());
+		}
 
-	~Sandbox() {}
+		~Sandbox() {}
 
-};
+	};
 
-Hazel::Application* Hazel::CreateApplication() {
-	return new Sandbox;
-};
+	Application* CreateApplication(ApplicationCommandLineArgs args) {
+		return new Sandbox(args);
+	};
+}
+
