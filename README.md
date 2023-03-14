@@ -17,43 +17,9 @@ This project includes spdlog log system, glfw event system, Layer layer design, 
 
 5. ImguiDocking: Docking of Imgui to realize editor dragging.
 
-6. OpenGLRendering: VBO、VAO、EBO、shader    
+6. OpenGLRendering: VBO、VAO、EBO、shader Abstraction：
 
-   Abstraction：
-
-   Vertex Buffer Layouts：
-
-   ```cpp
-   BufferLayout layout = { 
-   	{ ShaderDataType::Float3, "a_Position"}, 
-   	{ ShaderDataType::Float2, "a_TexCoord"} };
-   m_VertexBuffer->SetBufferLayout(layout);
-   ```
-
-   Vertex Arrays：
-
-   ```cpp
-   void OpenGLVertexArray::AddVertexBuffer(std::shared_ptr<VertexBuffer>& vertexBuffer)
-   {
-   	HAZEL_CORE_ASSERT(vertexBuffer->GetBufferLayout().GetCount(), "Empty Layout in VertexBuffer!");
-   	BufferLayout layout = vertexBuffer->GetBufferLayout();
-   	int index = 0;
-   	for (const BufferElement& element : layout)
-   	{
-   		glEnableVertexAttribArray(index);
-   		glVertexAttribPointer(index,
-   			GetShaderTypeDataCount(element.GetType()),
-   			GetShaderDataTypeToOpenGL(element.GetType()),
-   			element.IsNormalized() ? GL_TRUE : GL_FALSE,
-   			layout.GetStride(),
-   			(const void*)(element.GetOffset()));
-   		index++;
-   	}
-   }
-   ```
-
-   shaer、EBO part is easy
-
+   Vertex Buffer Layouts、Vertex Arrays、shaer、EBO part is easy
 
 7. Camera： P * V：OrthographicCamera&EditorCamera
 
@@ -65,23 +31,14 @@ This project includes spdlog log system, glfw event system, Layer layer design, 
 
     VertexBuffer: GL_STATIC_DRAW to GL_DYNAMIC_DRAW
 
-```cpp
-void glBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const void * data);
-void glNamedBufferSubData(GLuint buffer, GLintptr offset, GLsizeiptr size, const void *data)
-```
-
-Batching Rendering Textures: In order for the DrawQuad function to use the same texture together, the same texture can be used.
-
-```cpp
-glBindTextureUnit(slot, m_RendererID);
-```
-
 11. Editor
 
 12. FrameBuffer : Resize:change the camera frustum
 
 13. ECS: entt(Add、Has、Get)
+
 14. UI
+
 15. File system: Saving and Loading Scenes: YAML 、Open/Save File Dialogs：：https://docs.microsoft.com/en-us/office/[vba](https://so.csdn.net/so/search?q=vba&spm=1001.2101.3001.7020)/api/excel.application.getopenfilename
 
 16. Gizmos：ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transform));
@@ -90,46 +47,5 @@ glBindTextureUnit(slot, m_RendererID);
 
 18. SPIR-V & shaderc:
 
-    A)SPIR-V's compiler compiles Vulkan's shader into an intermediate language:
-
-    *1. 创建编译器: shaderc提供的glslang编译器*
-
-    *2. 遍历并编译每个shader, 比如vert或frag, 为其生成一个单独的binary文件*,*如果有现成的缓存文件, 那么直接读取该文件, 存到data里*,*否则编译出新的文件,把glsl文件编译为Spir-v* 
-
-    ```cpp
-    *shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source,Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str(), options);*
-    ```
-
-    *3. 所有的shader都读到shaderData*
-
-    B)SPIR-V's cross-platform compiler, such as GLSL, is translated for use on OpenGL
-
-    1.*获取shader缓存目录*
-
-    2.*编译为string，写为shaderdata*
-
-    ```
-    *shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str());*
-    ```
-
 19. UniformBuffer：A piece of memory located on the GPU can be shared by all Shader
-
-```
-// 0 uniform buffer
-layout(std140, binding = 0) uniform Transform
-{
-	mat4 Transform;
-}
-```
-
-```cpp
-std::vector<GLuint> shaderIDs;
-for (auto&& [stage, spirv] : m_OpenGLSPIRVCache)
-{
-	GLuint shaderID = shaderIDs.emplace_back(glCreateShader(Utils::ShaderTypeToOpenGL(stage)));
-	glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), spirv.size() * sizeof(uint32_t));
-	glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
-	glAttachShader(m_RendererID, shaderID);
-}
-```
 
