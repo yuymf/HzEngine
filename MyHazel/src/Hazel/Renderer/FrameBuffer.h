@@ -1,62 +1,66 @@
 #pragma once
 
-#include "Hazel/Core/Base.h"
+#include <glm/glm.hpp>
+
+#include "Hazel/Renderer/RendererAPI.h"
 
 namespace Hazel {
 
-	enum class FramebufferTextureFormat {
-		None = 0, 
-		RGBA8,
-		RED_INTEGER,			// Color			
-		DEPTH24STENCIL8,		// Depth, Stencil
-		Depth = DEPTH24STENCIL8 // Default
-	};
-
-	struct FramebufferTextureSpecification
+	enum class FramebufferFormat
 	{
-		FramebufferTextureSpecification() = default;
-		FramebufferTextureSpecification(FramebufferTextureFormat format)
-			: TextureFormat(format) {}
-
-		FramebufferTextureFormat TextureFormat = FramebufferTextureFormat::None;
-		// TODO: filtering/wrap
-	};
-
-	struct FramebufferAttachmentSpecification
-	{
-		FramebufferAttachmentSpecification() = default;
-		FramebufferAttachmentSpecification(std::initializer_list<FramebufferTextureSpecification> attachment)
-			: Attachments(attachment) {}
-
-		std::vector<FramebufferTextureSpecification> Attachments;
+		None    = 0,
+		RGBA8   = 1,
+		RGBA16F = 2
 	};
 
 	struct FramebufferSpecification
 	{
-		uint32_t Width = 0, Height = 0;
-		FramebufferAttachmentSpecification Attachments;
-		uint32_t Samples = 1;
-
+		uint32_t Width = 1280;
+		uint32_t Height = 720;
+		glm::vec4 ClearColor;
+		FramebufferFormat Format;
+		uint32_t Samples = 1; // multisampling
+		
+		// SwapChainTarget = screen buffer (i.e. no framebuffer)
 		bool SwapChainTarget = false;
 	};
 
 	class Framebuffer
 	{
 	public:
-		virtual ~Framebuffer() = default;
-		virtual void Bind() = 0;
-		virtual void Unbind() = 0;
+		virtual ~Framebuffer() {}
+		virtual void Bind() const = 0;
+		virtual void Unbind() const = 0;
 
-		virtual void Resize(uint32_t width, uint32_t height) = 0;
-		virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) = 0;
+		virtual void Resize(uint32_t width, uint32_t height, bool forceRecreate = false) = 0;
 
-		virtual void ClearAttachment(uint32_t attachmentIndex, int value) = 0;
+		virtual void BindTexture(uint32_t slot = 0) const = 0;
 
-		virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const = 0;
+		virtual RendererID GetRendererID() const = 0;
+		virtual RendererID GetColorAttachmentRendererID() const = 0;
+		virtual RendererID GetDepthAttachmentRendererID() const = 0;
 
 		virtual const FramebufferSpecification& GetSpecification() const = 0;
 
 		static Ref<Framebuffer> Create(const FramebufferSpecification& spec);
+	};
+
+	class FramebufferPool final
+	{
+	public:
+		FramebufferPool(uint32_t maxFBs = 32);
+		~FramebufferPool();
+
+		std::weak_ptr<Framebuffer> AllocateBuffer();
+		void Add(std::weak_ptr<Framebuffer> framebuffer);
+
+		const std::vector<std::weak_ptr<Framebuffer>>& GetAll() const { return m_Pool; }
+
+		inline static FramebufferPool* GetGlobal() { return s_Instance; }
+	private:
+		std::vector<std::weak_ptr<Framebuffer>> m_Pool;
+
+		static FramebufferPool* s_Instance;
 	};
 
 }

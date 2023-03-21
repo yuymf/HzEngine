@@ -1,69 +1,72 @@
 #include "hzpch.h"
-#include "Hazel/Renderer/Shader.h"
+#include "Shader.h"
 
 #include "Hazel/Renderer/Renderer.h"
-#include "Platform/OpenGL/OpenGLShader.h"
+#include "Hazel/Platform/OpenGL/OpenGLShader.h"
 
 namespace Hazel {
-	
+
+	std::vector<Ref<Shader>> Shader::s_AllShaders;
+
 	Ref<Shader> Shader::Create(const std::string& filepath)
 	{
-		switch (Renderer::GetAPI())
+		Ref<Shader> result = nullptr;
+
+		switch (RendererAPI::Current())
 		{
-		case RendererAPI::API::None:	HZ_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:	return CreateRef<OpenGLShader>(filepath);
+			case RendererAPIType::None: return nullptr;
+			case RendererAPIType::OpenGL: result = std::make_shared<OpenGLShader>(filepath);
 		}
-		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
+		s_AllShaders.push_back(result);
+		return result;
 	}
 
-	Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+	Ref<Shader> Shader::CreateFromString(const std::string& source)
 	{
-		switch (Renderer::GetAPI())
+		Ref<Shader> result = nullptr;
+
+		switch (RendererAPI::Current())
 		{
-			case RendererAPI::API::None:	HZ_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
+			case RendererAPIType::None: return nullptr;
+			case RendererAPIType::OpenGL: result = OpenGLShader::CreateFromString(source);
 		}
-		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
+		s_AllShaders.push_back(result);
+		return result;
 	}
 
-	void ShaderLibrary::Add(const Ref<Shader>& shader)
+	ShaderLibrary::ShaderLibrary()
+	{
+	}
+
+	ShaderLibrary::~ShaderLibrary()
+	{
+	}
+
+	void ShaderLibrary::Add(const Hazel::Ref<Shader>& shader)
 	{
 		auto& name = shader->GetName();
+		HZ_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
 		m_Shaders[name] = shader;
-
 	}
-	void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader)
+
+	void ShaderLibrary::Load(const std::string& path)
 	{
-		HZ_CORE_ASSERT(!Exist(name), "Shader already exists!")
+		auto shader = Ref<Shader>(Shader::Create(path));
+		auto& name = shader->GetName();
+		HZ_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
 		m_Shaders[name] = shader;
-
 	}
 
-	Ref<Shader> ShaderLibrary::Load(const std::string& filepath)
+	void ShaderLibrary::Load(const std::string& name, const std::string& path)
 	{
-		auto shader = Shader::Create(filepath);
-		Add(shader);
-		return shader;
+		HZ_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
+		m_Shaders[name] = Ref<Shader>(Shader::Create(path));
 	}
 
-	Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& filepath)
+	Ref<Shader>& ShaderLibrary::Get(const std::string& name)
 	{
-		auto shader = Shader::Create(filepath);
-		Add(name, shader);
-		return shader;
-	}
-
-	Ref<Shader> ShaderLibrary::Get(const std::string& name)
-	{
-		HZ_CORE_ASSERT(Exist(name), "Shader not find");
+		HZ_CORE_ASSERT(m_Shaders.find(name) != m_Shaders.end());
 		return m_Shaders[name];
-	}
-
-	bool ShaderLibrary::Exist(const std::string& name) const
-	{
-		return m_Shaders.find(name) != m_Shaders.end();
 	}
 
 }

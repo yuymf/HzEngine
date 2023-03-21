@@ -1,15 +1,16 @@
 #include "hzpch.h"
-#include "Hazel/Core/LayerStack.h"
+#include "LayerStack.h"
 
 namespace Hazel {
+
+	LayerStack::LayerStack()
+	{
+	}
 
 	LayerStack::~LayerStack()
 	{
 		for (Layer* layer : m_Layers)
-		{
-			layer->OnDetach();
 			delete layer;
-		}
 	}
 
 	void LayerStack::PushLayer(Layer* layer)
@@ -28,20 +29,17 @@ namespace Hazel {
 		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
 		if (it != m_Layers.end())
 		{
-			layer->OnDetach();
 			m_Layers.erase(it);
 			m_LayerInsertIndex--;
 		}
+
 	}
 
 	void LayerStack::PopOverlay(Layer* overlay)
 	{
-		auto it = std::find(m_Layers.begin(), m_Layers.begin() + m_LayerInsertIndex, overlay);
-		if (it != m_Layers.begin() + m_LayerInsertIndex)
-		{
-			overlay->OnDetach();
+		auto it = std::find(m_Layers.begin(), m_Layers.end(), overlay);
+		if (it != m_Layers.end())
 			m_Layers.erase(it);
-		}
 	}
 
 }

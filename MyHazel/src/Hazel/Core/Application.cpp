@@ -1,144 +1,164 @@
-﻿#include "hzpch.h"															//every cpp files need to include pch!
-#include "Hazel/Core/Application.h"
-
-#include "Hazel/Core/Log.h"
+#include "hzpch.h"
+#include "Application.h"
 
 #include "Hazel/Renderer/Renderer.h"
-
-#include "Hazel/Core/Input.h"
-
+#include "Hazel/Renderer/Framebuffer.h"
 #include <GLFW/glfw3.h>
+
+#include <imgui/imgui.h>
+
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#include <Windows.h>
 
 namespace Hazel {
 
+#define BIND_EVENT_FN(fn) std::bind(&Application::##fn, this, std::placeholders::_1)
+
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application(const std::string& name, ApplicationCommandLineArgs args)
-		: m_CommandLineArgs(args)
+	Application::Application(const ApplicationProps& props)
 	{
-		HZ_PROFILE_FUNCTION();
-
-		HZ_CORE_ASSERT(!s_Instance, "Application already exists");
 		s_Instance = this;
 
-		m_Window = Window::Create(WindowProps(name));
-		m_Window->SetEventCallback(HZ_BIND_EVENT_FN(Application::OnEvent));
+		m_Window = std::unique_ptr<Window>(Window::Create(WindowProps(props.Name, props.WindowWidth, props.WindowHeight)));
+		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+		m_Window->SetVSync(false);
 
-		//m_Window->SetVSync(false);
-		 
+		m_ImGuiLayer = new ImGuiLayer("ImGui");
+		PushOverlay(m_ImGuiLayer);
+
 		Renderer::Init();
-
-		m_ImGuiLayer = new ImGuiLayer();
-		PushOverLay(m_ImGuiLayer);
-
+		Renderer::WaitAndRender();
 	}
 
 	Application::~Application()
 	{
-		HZ_PROFILE_FUNCTION();
 
-		Renderer::Shutdown();
 	}
 
-	void Application::PushLayer(Layer* Layer)
+	void Application::PushLayer(Layer* layer)
 	{
-		HZ_PROFILE_FUNCTION();
-
-		m_Layerstack.PushLayer(Layer);
-		Layer->OnAttach();
+		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
 	}
 
-	void Application::PushOverLay(Layer* Layer)
+	void Application::PushOverlay(Layer* layer)
 	{
-		HZ_PROFILE_FUNCTION();
-
-		m_Layerstack.PushOverlay(Layer);
-		Layer->OnAttach();
+		m_LayerStack.PushOverlay(layer);
+		layer->OnAttach();
 	}
 
-	void Application::Close()
+	void Application::RenderImGui()
 	{
-		m_Running = false;
-	}
+		m_ImGuiLayer->Begin();
 
-	void Application::OnEvent(Event& e)
-	{
-		HZ_PROFILE_FUNCTION();
+		ImGui::Begin("Renderer");
+		auto& caps = RendererAPI::GetCapabilities();
+		ImGui::Text("Vendor: %s", caps.Vendor.c_str());
+		ImGui::Text("Renderer: %s", caps.Renderer.c_str());
+		ImGui::Text("Version: %s", caps.Version.c_str());
+		ImGui::Text("Frame Time: %.2fms\n", m_TimeStep.GetMilliseconds());
+		ImGui::End();
 
-		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(HZ_BIND_EVENT_FN(Application::OnWindowsClose));
-		dispatcher.Dispatch<WindowResizeEvent>(HZ_BIND_EVENT_FN(Application::OnWindowsResize));
+		for (Layer* layer : m_LayerStack)
+			layer->OnImGuiRender();
 
-		//HZ_CORE_TRACE("{0}", e);
-
-		//handle from top
-		for (auto it = m_Layerstack.rbegin(); it != m_Layerstack.rend(); ++it)
-		{
-			//Imgui handling mouseand keyboards events
-			if (e.Handled)
-				break;
-			(*it)->OnEvent(e);
-		}
+		m_ImGuiLayer->End();
 	}
 
 	void Application::Run()
 	{
-		HZ_PROFILE_FUNCTION();
-
+		OnInit();
 		while (m_Running)
 		{
-			HZ_PROFILE_SCOPE("RunLoop");
-
-			float time = (float)glfwGetTime();
-			Timestep timestep = time - m_LastFrameTime;
-			m_LastFrameTime = time;
-
 			if (!m_Minimized)
 			{
-				{
-					HZ_PROFILE_SCOPE("LayerStack OnUpdate");
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate(m_TimeStep);
 
-					for (Layer* layer : m_Layerstack)
-						layer->OnUpdate(timestep);
+				// Render ImGui on render thread
+				Application* app = this;
+				Renderer::Submit([app]() { app->RenderImGui(); });
 
-				}
-
-				m_ImGuiLayer->Begin();
-				{
-					HZ_PROFILE_SCOPE("LayerStack OnUpdate");
-
-					for (Layer* layer : m_Layerstack)
-						layer->OnImGuiRender();
-				}
-				m_ImGuiLayer->End();
-
+				Renderer::WaitAndRender();
 			}
 			m_Window->OnUpdate();
+
+			float time = GetTime();
+			m_TimeStep = time - m_LastFrameTime;
+			m_LastFrameTime = time;
+		}
+		OnShutdown();
+	}
+
+	void Application::OnEvent(Event& event)
+	{
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+
+		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+		{
+			(*--it)->OnEvent(event);
+			if (event.Handled)
+				break;
 		}
 	}
 
-	bool Application::OnWindowsClose(WindowCloseEvent& e)
+	bool Application::OnWindowResize(WindowResizeEvent& e)
+	{
+		int width = e.GetWidth(), height = e.GetHeight();	
+		if (width == 0 || height == 0)
+		{
+			m_Minimized = true;
+			return false;
+		}
+		m_Minimized = false;
+		Renderer::Submit([=]() { glViewport(0, 0, width, height); });
+		auto& fbs = FramebufferPool::GetGlobal()->GetAll();
+		for (auto& fb : fbs)
+		{
+			if (auto fbp = fb.lock())
+				fbp->Resize(width, height);
+		}
+		return false;
+	}
+
+	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
 		m_Running = false;
 		return true;
 	}
 
-	bool Application::OnWindowsResize(WindowResizeEvent& e)
+	std::string Application::OpenFile(const std::string& filter) const
 	{
-		//当窗口最小化时，layer->Update停止；
-		HZ_PROFILE_FUNCTION();
+		OPENFILENAMEA ofn;       // common dialog box structure
+		CHAR szFile[260] = { 0 };       // if using TCHAR macros
 
-		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		// Initialize OPENFILENAME
+		ZeroMemory(&ofn, sizeof(OPENFILENAME));
+		ofn.lStructSize = sizeof(OPENFILENAME);
+		ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)m_Window->GetNativeWindow());
+		ofn.lpstrFile = szFile;
+		ofn.nMaxFile = sizeof(szFile);
+		ofn.lpstrFilter = "All\0*.*\0";
+		ofn.nFilterIndex = 1;
+		ofn.lpstrFileTitle = NULL;
+		ofn.nMaxFileTitle = 0;
+		ofn.lpstrInitialDir = NULL;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+		if (GetOpenFileNameA(&ofn) == TRUE)
 		{
-			m_Minimized = true;
-			return false;
+			return ofn.lpstrFile;
 		}
+		return std::string();
+	}
 
-		m_Minimized = false;
-
-		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
-
-		return false;
+	float Application::GetTime() const
+	{
+		return (float)glfwGetTime();
 	}
 
 }

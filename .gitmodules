@@ -1,22 +1,10 @@
-[submodule "MyHazel/vendor/spdlog"]
-	path = MyHazel/vendor/spdlog
-	url = ../../gabime/spdlog.git
-	branch = v1.x
 [submodule "MyHazel/vendor/GLFW"]
 	path = MyHazel/vendor/GLFW
-	url = ../../TheCherno/glfw.git
-	branch = master
+	url = https://github.com/TheCherno/glfw
 [submodule "MyHazel/vendor/imgui"]
 	path = MyHazel/vendor/imgui
-	url = ../../TheCherno/imgui.git
-	branch = docking
+	url = https://github.com/TheCherno/imgui
+    branch = docking
 [submodule "MyHazel/vendor/glm"]
 	path = MyHazel/vendor/glm
-	url = ../../g-truc/glm.git
-	branch = master
-[submodule "MyHazel/vendor/yaml-cpp"]
-	path = MyHazel/vendor/yaml-cpp
-	url = ../../TheCherno/yaml-cpp.git
-[submodule "MyHazel/vendor/ImGuizmo"]
-	path = MyHazel/vendor/ImGuizmo
-	url = ../../Thecherno/imguizmo
+	url = https://github.com/g-truc/glm

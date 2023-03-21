@@ -1,5 +1,5 @@
 #include "hzpch.h"
-#include "Hazel/Core/Layer.h"
+#include "Layer.h"
 
 namespace Hazel {
 
@@ -7,5 +7,10 @@ namespace Hazel {
 		: m_DebugName(debugName)
 	{
 	}
-	
+
+	Layer::~Layer()
+	{
+
+	}
+
 }
