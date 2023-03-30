@@ -7,6 +7,7 @@ IncludeDir = {}
 IncludeDir["stb_image"] = "%{wks.location}/MyHazel/vendor/stb_image"
 IncludeDir["yaml_cpp"] = "%{wks.location}/MyHazel/vendor/yaml-cpp/include"
 IncludeDir["GLFW"] = "%{wks.location}/MyHazel/vendor/GLFW/include"
+IncludeDir["Box2D"] = "%{wks.location}/MyHazel/vendor/Box2D/include"
 IncludeDir["Glad"] = "%{wks.location}/MyHazel/vendor/Glad/include"
 IncludeDir["ImGui"] = "%{wks.location}/MyHazel/vendor/ImGui"
 IncludeDir["ImGuizmo"] = "%{wks.location}/MyHazel/vendor/ImGuizmo"

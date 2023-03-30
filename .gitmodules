@@ -20,3 +20,6 @@
 [submodule "MyHazel/vendor/ImGuizmo"]
 	path = MyHazel/vendor/ImGuizmo
 	url = ../../Thecherno/imguizmo
+[submodule "Myhazel/vendor/Box2D"]
+	path = MyHazel/vendor/Box2D
+	url = https://github.com/thecherno/box2d

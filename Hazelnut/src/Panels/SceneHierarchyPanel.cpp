@@ -254,23 +254,40 @@ namespace Hazel {
 
 		if (ImGui::BeginPopup("AddComponent"))
 		{
-			if (ImGui::MenuItem("Camera"))
+			if (!m_SelectedContext.HasComponent<CameraComponent>())
 			{
-				// prevent add repeately
-				if (!m_SelectedContext.HasComponent<CameraComponent>())
+				if (ImGui::MenuItem("Camera"))
+				{
 					m_SelectedContext.AddComponent<CameraComponent>();
-				else
-					HZ_CORE_WARN("This entity already has the Camera Component!");
-				ImGui::CloseCurrentPopup();
+					ImGui::CloseCurrentPopup();
+				}
 			}
 
-			if (ImGui::MenuItem("Sprite Renderer"))
+			if (!m_SelectedContext.HasComponent<SpriteRendererComponent>())
 			{
-				if (!m_SelectedContext.HasComponent<SpriteRendererComponent>())
+				if (ImGui::MenuItem("Sprite Renderer"))
+				{
 					m_SelectedContext.AddComponent<SpriteRendererComponent>();
-				else
-					HZ_CORE_WARN("This entity already has the Sprite Renderer Component!");
-				ImGui::CloseCurrentPopup();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (!m_SelectedContext.HasComponent<RigidBody2DComponent>())
+			{
+				if (ImGui::MenuItem("RigidBody Renderer"))
+				{
+					m_SelectedContext.AddComponent<RigidBody2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (!m_SelectedContext.HasComponent<BoxCollider2DComponent>())
+			{
+				if (ImGui::MenuItem("BoxCollider Renderer"))
+				{
+					m_SelectedContext.AddComponent<BoxCollider2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
 			}
 
 			ImGui::EndPopup();
@@ -370,6 +387,41 @@ namespace Hazel {
 
 				ImGui::EndDragDropTarget();
 			}
+		});
+
+		DrawComponent<RigidBody2DComponent>("RigidBody Renderer", entity, [](auto& component)
+		{
+			const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
+			const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
+			if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
+					if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
+					{
+						currentBodyTypeString = bodyTypeStrings[i];
+						component.Type = (RigidBody2DComponent::BodyType)i;
+					}
+
+					if (isSelected)
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
+			}
+
+			ImGui::Checkbox("Fixed Rotation", &component.FixedRot);
+		});
+
+		DrawComponent<BoxCollider2DComponent>("BoxCollider Renderer", entity, [](auto& component)
+		{
+			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
+			ImGui::DragFloat2("Size", glm::value_ptr(component.Offset));
+			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution", &component.Restitution, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
 		});
 
 	}

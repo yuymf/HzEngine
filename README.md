@@ -1,7 +1,11 @@
 # HzEngine
-A C++ Mini Game Engine!
+A C++ Mini Game Engine Editor aimed to Cross-Platform&API!
 
-This project is based on the Hazel engine of the Cherno. Thank you very much for Cherno's open source and videos.
+**Setup**: scripts/Setup.bat 、Win-GenProjects.bat in order.
+
+**Platform**:  Now only supports windows & OpenGL Api.
+
+![ShowUp](img/ShowUp.gif)
 
 ![20230311100306](img/20230311100306.png)
 
@@ -47,5 +51,10 @@ This project includes spdlog log system, glfw event system, Layer layer design, 
 
 18. SPIR-V & shaderc:
 
-19. UniformBuffer：A piece of memory located on the GPU can be shared by all Shader
+19. UniformBuffer：A piece of memory located on the GPU can be shared by all Shader.
 
+20. 2DphysicsSystem: with Box2D.
+
+This project is based on the Hazel engine of the Cherno. Thank you very much for Cherno's videos.
+
+**TODO**: Merge things in Dev Branch of 3D...

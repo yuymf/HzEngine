@@ -33,6 +33,7 @@ project "MyHazel"
 		"src",
 		"vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.stb_image}",
@@ -46,6 +47,7 @@ project "MyHazel"
 	links
 	{
 		"GLFW",
+		"Box2D",
 		"Glad",
 		"ImGui",
 		"yaml-cpp",

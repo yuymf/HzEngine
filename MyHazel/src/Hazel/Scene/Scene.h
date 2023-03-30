@@ -5,6 +5,7 @@
 #include "Hazel/Core/Timestep.h"
 #include "Hazel/Renderer/EditorCamera.h"
 
+class b2World;
 
 namespace Hazel {
 
@@ -23,6 +24,9 @@ namespace Hazel {
 		void OnUpdateEditor(Timestep ts, EditorCamera& camera);
 		void OnViewportResize(uint32_t width, uint32_t height);
 
+		void OnRuntimeStart();
+		void OnRuntimeStop();
+
 		Entity GetPrimaryCameraEntity();
 
 	private:
@@ -32,6 +36,8 @@ namespace Hazel {
 	private:
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+
+		b2World* m_PhysicsWorld = nullptr;
 
 		// friend class can use the privatemember
 		friend class Entity;

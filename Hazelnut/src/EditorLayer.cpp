@@ -299,10 +299,10 @@ namespace Hazel {
 		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 		if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
 		{
-			if (m_SceneState == SceneState::Play)
-				OnSceneStop();
-			else if (m_SceneState == SceneState::Edit)
+			if (m_SceneState == SceneState::Edit)
 				OnScenePlay();
+			else if (m_SceneState == SceneState::Play)
+				OnSceneStop();
 		}
 		ImGui::PopStyleVar(2);
 		ImGui::PopStyleColor(3);
@@ -524,11 +524,13 @@ namespace Hazel {
 	void EditorLayer::OnScenePlay()
 	{
 		m_SceneState = SceneState::Play;
+		m_ActiveScene->OnRuntimeStart();
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
 		m_SceneState = SceneState::Edit;
+		m_ActiveScene->OnRuntimeStop();
 	}
 
 }
