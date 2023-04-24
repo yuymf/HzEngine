@@ -13,7 +13,6 @@ namespace Hazel {
 		void Render();
 	private:
 		ImVec2 m_RenderViewPortSize;
-		Ref<Image> m_Image;
 
 		Ref<Timer> m_Timer;
 		float m_LastRenderTime;

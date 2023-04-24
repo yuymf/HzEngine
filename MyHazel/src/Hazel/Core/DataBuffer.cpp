@@ -3,7 +3,8 @@
 
 namespace Hazel {
 
-	DataBuffer::DataBuffer(uint64_t dataBufferSize)
+	DataBuffer::DataBuffer(uint64_t dataBufferSize, uint8_t channel)
+		: m_Channel(channel)
 	{
 		Resize(dataBufferSize);
 	}
@@ -15,8 +16,9 @@ namespace Hazel {
 
 	void DataBuffer::Resize(uint64_t dataBufferSize)
 	{
-		m_DataBuffer = Ref<uint8_t>(new uint8_t[dataBufferSize], std::default_delete<uint8_t>());
-		m_DataBufferSize = dataBufferSize;
+		m_DataBuffer = Ref<uint8_t>(new uint8_t[dataBufferSize * m_Channel], std::default_delete<uint8_t>());
+		m_DataBufferSize = dataBufferSize * m_Channel;
+		//m_DataBufferSize = dataBufferSize;
 	}
 
 	void DataBuffer::SetDataBuffer(const void* dataBuffer)
@@ -36,7 +38,7 @@ namespace Hazel {
 
 	Ref<DataBuffer> DataBuffer::DepthCopy(Ref<DataBuffer> dataBuffer)
 	{
-		auto CopyBuffer = CreateRef<DataBuffer>(dataBuffer->m_DataBufferSize);
+		auto CopyBuffer = CreateRef<DataBuffer>(dataBuffer->m_DataBufferSize, dataBuffer->m_Channel);
 		memcpy(CopyBuffer.get(), dataBuffer->m_DataBuffer.get(), dataBuffer->m_DataBufferSize);
 		return CopyBuffer;
 	}

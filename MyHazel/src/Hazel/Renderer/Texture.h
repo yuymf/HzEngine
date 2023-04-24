@@ -43,6 +43,9 @@ namespace Hazel {
 	public:
 		static Ref<Texture2D> Create(uint32_t width, uint32_t height, InternalFormat internalFormat, DataFormat dataFormat);
 		static Ref<Texture2D> Create(const std::string& path);
+		virtual void Resize(uint32_t width, uint32_t height);
+	private:
+		uint32_t m_Width, m_Height;
 	};
 
 }

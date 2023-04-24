@@ -5,8 +5,8 @@
 
 #include <glad/glad.h>
 
-namespace Hazel {
-
+namespace Hazel 
+{
 	namespace
 	{
 		void GetFormat(int channels, GLenum& internalFormat, GLenum& dataFormat)
@@ -91,6 +91,8 @@ namespace Hazel {
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 		glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
+		//glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0,
+		//	m_DataFormat, GL_UNSIGNED_BYTE, nullptr);
 
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -134,6 +136,7 @@ namespace Hazel {
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 		glTextureStorage2D(m_RendererID, 1, internalFormat, m_Width, m_Height);
+		//glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -156,6 +159,26 @@ namespace Hazel {
 		glDeleteTextures(1, &m_RendererID);
 	}
 
+	void OpenGLTexture2D::Resize(uint32_t width, uint32_t height)
+	{
+		if (width != m_Width || height != m_Height)
+		{
+			m_Width = width;
+			m_Height = height;
+			glBindTexture(GL_TEXTURE_2D, m_RendererID);
+
+			glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0,
+				m_DataFormat, GL_UNSIGNED_BYTE, nullptr);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+	}
+
 	void OpenGLTexture2D::SetData(void* data, uint32_t size)
 	{
 		HZ_PROFILE_FUNCTION();
@@ -171,4 +194,5 @@ namespace Hazel {
 
 		glBindTextureUnit(slot, m_RendererID);
 	}
+
 }

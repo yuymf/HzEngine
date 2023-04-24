@@ -1,10 +1,11 @@
 #include "RayTracingLayer.h"
 #include <ImGui/imgui.h>
+#include "Hazel/Renderer/RendererImage.h"
 
 namespace Hazel {
 
 	RayTracingLayer::RayTracingLayer()
-		: m_RenderViewPortSize(ImVec2(0.0f, 0.0f)), m_Image(nullptr), m_Timer(CreateRef<Timer>()), m_LastRenderTime(0.f)
+		: m_RenderViewPortSize(ImVec2(0.0f, 0.0f)), m_Timer(CreateRef<Timer>()), m_LastRenderTime(0.f)
 	{
 
 	}
@@ -100,9 +101,11 @@ namespace Hazel {
 		m_RenderViewPortSize.x = ImGui::GetContentRegionAvail().x;
 		m_RenderViewPortSize.y = ImGui::GetContentRegionAvail().y;
 
-		if (m_Image != nullptr)
+
+		auto image = RendererImage::GetImage();
+		if (image > 0)
 		{
-			ImGui::Image((void*)m_Image->GetImage(), m_RenderViewPortSize, ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::Image((void*)image, m_RenderViewPortSize, ImVec2(0, 1), ImVec2(1, 0));
 		}
 
 		ImGui::End();
@@ -117,18 +120,9 @@ namespace Hazel {
 	void RayTracingLayer::Render()
 	{
 		m_Timer->Reset();
-		if (m_Image == nullptr || m_RenderViewPortSize.x != m_Image->GetWidth()
-			|| m_RenderViewPortSize.y != m_Image->GetHeight())
-		{
-			m_Image = CreateRef<Image>(m_RenderViewPortSize.x, m_RenderViewPortSize.y, InternalFormat::RGBA32F, DataFormat::RGBA);
-		}
 
-		auto pImageData = m_Image->GetImageData();
-		for (auto i = 0; i < m_RenderViewPortSize.x * m_RenderViewPortSize.y; i++)
-		{
-			pImageData[i] = Random::Uint32();
-			pImageData[i] |= 0xff000000;
-		}
+		RendererImage::OnWindowResize(m_RenderViewPortSize.x, m_RenderViewPortSize.y);
+		RendererImage::OnRender();
 
 		m_LastRenderTime = m_Timer->ElapsedMillis();
 	}

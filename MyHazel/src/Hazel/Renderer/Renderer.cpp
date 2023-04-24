@@ -1,6 +1,7 @@
 #include "hzpch.h"
 #include "Renderer.h"
 #include "Renderer2D.h"
+#include "RendererImage.h"
 
 #include "Platform/OpenGL/OpenGLShader.h"
 
@@ -14,6 +15,7 @@ namespace Hazel {
 
 		RenderCommand::Init();
 		Renderer2D::Init();
+		RendererImage::Init();
 	}
 
 	void Renderer::Shutdown()

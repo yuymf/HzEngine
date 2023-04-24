@@ -4,7 +4,7 @@ namespace Hazel {
 	class DataBuffer
 	{
 	public:
-		DataBuffer(uint64_t dataBufferSize);
+		DataBuffer(uint64_t dataBufferSize, uint8_t channel);
 		DataBuffer() = default;
 		DataBuffer(const DataBuffer&) = default;
 		~DataBuffer();
@@ -28,5 +28,6 @@ namespace Hazel {
 	private:
 		Ref<uint8_t> m_DataBuffer;
 		uint64_t m_DataBufferSize;
+		uint8_t m_Channel;
 	};
 }
