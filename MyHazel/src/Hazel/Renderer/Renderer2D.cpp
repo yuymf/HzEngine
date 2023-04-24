@@ -94,8 +94,8 @@ namespace Hazel {
 		s_Data.QuadVertexArray->SetIndexBuffer(quadIB);
 		delete[] quadIndices;
 
-		//derectly way || shaderlibrary:Load(create,add)->Get
-		s_Data.WhiteTexture = Texture2D::Create(1, 1);							//Size
+		//directly way || shaderLibrary:Load(create,add)->Get
+		s_Data.WhiteTexture = Texture2D::Create(1, 1, InternalFormat::RGBA8, DataFormat::RGBA);	//Size
 		uint32_t whiteTextureData = 0xffffffff;
 		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));		//Color
 

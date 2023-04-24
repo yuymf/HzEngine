@@ -15,9 +15,9 @@ project "Sandbox"
 
 	includedirs
 	{
-		"%{wks.location/MyHazel/vendor/spdlog/include",
-		"%{wks.location/MyHazel/src",
-		"%{wks.location/MyHazel/vendor",
+		"%{wks.location}/MyHazel/vendor/spdlog/include",
+		"%{wks.location}/MyHazel/src",
+		"%{wks.location}/MyHazel/vendor",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}"
 	}

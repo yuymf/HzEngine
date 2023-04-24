@@ -2,6 +2,7 @@
 #include <Hazel/Core/EntryPoint.h>
 
 #include "EditorLayer.h"
+#include "RayTracingLayer.h"
 
 namespace Hazel {
 
@@ -11,7 +12,8 @@ namespace Hazel {
 		Hazelnut(ApplicationCommandLineArgs args)
 			: Application("WhyU Editor", args)
 		{
-			PushLayer(new EditorLayer());
+			//PushLayer(new EditorLayer());
+			PushLayer(new RayTracingLayer());
 		}
 
 		~Hazelnut() {}

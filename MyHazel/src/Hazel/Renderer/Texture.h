@@ -4,6 +4,24 @@
 
 namespace Hazel {
 
+	enum class InternalFormat
+	{
+		NONE = 0,
+		RED,
+		RGB,
+		RGBA,
+		RGBA8,
+		RGBA32F
+	};
+
+	enum class DataFormat
+	{
+		NONE = 0,
+		RED,
+		RGB,
+		RGBA
+	};
+
 	class Texture
 	{
 	public:
@@ -23,7 +41,7 @@ namespace Hazel {
 	class Texture2D : public Texture
 	{
 	public:
-		static Ref<Texture2D> Create(uint32_t width, uint32_t height);
+		static Ref<Texture2D> Create(uint32_t width, uint32_t height, InternalFormat internalFormat, DataFormat dataFormat);
 		static Ref<Texture2D> Create(const std::string& path);
 	};
 

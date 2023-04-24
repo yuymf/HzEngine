@@ -12,6 +12,7 @@
 #include "Hazel/Core/Layer.h"
 #include "Hazel/Core/Log.h"
 #include "Hazel/Core/Assert.h"
+#include "Hazel/Core/Timer.h"
 #include "Hazel/Renderer/OrthographicCameraController.h"
 
 #include "Hazel/ImGui/ImGuiLayer.h"
@@ -34,3 +35,6 @@
 
 #include "Hazel/Renderer/OrthographicCamera.h"
 // ------------------------------------ 
+#include "Hazel/Renderer/Image/Image.h"
+
+#include "Hazel/Math/Random.h"

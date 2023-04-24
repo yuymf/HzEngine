@@ -6,13 +6,88 @@
 #include <glad/glad.h>
 
 namespace Hazel {
-	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
-		:m_Width(width), m_Height(height)
+
+	namespace
+	{
+		void GetFormat(int channels, GLenum& internalFormat, GLenum& dataFormat)
+		{
+			switch (channels)
+			{
+			case 1:
+			{
+				internalFormat = GL_RED;
+				dataFormat = GL_RED;
+				break;
+			}
+			case 3:
+			{
+				internalFormat = GL_RGB8;
+				dataFormat = GL_RGB;
+				break;
+			}
+			case 4:
+			{
+				internalFormat = GL_RGBA8;
+				dataFormat = GL_RGBA;
+				break;
+			}
+			default:
+			{
+				HZ_CORE_ERROR("Unknown Image Data Channel");
+				break;
+			}
+			}
+		}
+
+		GLenum InternalFormatToOpenGL(InternalFormat internalFormat)
+		{
+			switch (internalFormat)
+			{
+			case InternalFormat::NONE:
+				return 0;
+			case InternalFormat::RED:
+				return GL_RED;
+			case InternalFormat::RGB:
+				return GL_RGB;
+			case InternalFormat::RGBA:
+				return GL_RGBA;
+			case InternalFormat::RGBA8:
+				return GL_RGBA8;
+			case InternalFormat::RGBA32F:
+				return GL_RGBA32F;
+			default:
+			{
+				HZ_CORE_ERROR("Unknown Internal Format");
+				return 0;
+			}
+			}
+		}
+
+		GLenum DataFormatToOpenGL(DataFormat dataFormat)
+		{
+			switch (dataFormat)
+			{
+			case DataFormat::NONE:
+				return 0;
+			case DataFormat::RED:
+				return GL_RED;
+			case DataFormat::RGB:
+				return GL_RGB;
+			case DataFormat::RGBA:
+				return GL_RGBA;
+			default:
+			{
+				HZ_CORE_ERROR("Unknown Data Format");
+				return 0;
+			}
+			}
+		}
+	}
+
+	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, InternalFormat internalFormat, DataFormat dataFormat)
+		:m_Width(width), m_Height(height), m_InternalFormat(InternalFormatToOpenGL(internalFormat)), m_DataFormat(DataFormatToOpenGL(dataFormat))
 	{
 		HZ_PROFILE_FUNCTION();
-
-		m_InternalFormat = GL_RGBA8;
-		m_DataFormat = GL_RGBA;
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 		glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);

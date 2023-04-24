@@ -494,7 +494,7 @@ namespace Hazel {
 
 	void EditorLayer::OpenScene()
 	{
-		std::optional<std::string> filepath = FileDialogs::OpenFile("Hazel Scene (*.hazel)\0*.hazel\0");
+		std::optional<std::string> filepath = FileDialogs::OpenFile("Hazel Scene (*.yu)\0*.yu\0");
 		if (filepath)
 		{
 			OpenScene(filepath.value());
