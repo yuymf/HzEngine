@@ -41,7 +41,8 @@ namespace Hazel {
 
 	uint32_t Image::GetImage() const
 	{
-		m_Texture->SetData(m_DataBuffer->As<uint32_t>(), m_DataBuffer->GetDataBufferSize());
+		//m_Texture->SetData(m_DataBuffer->As<uint32_t>(), m_DataBuffer->GetDataBufferSize());
+		// Bug Fixed: When GetImage Don't UpdateData(setData) !
 		return m_Texture->GetRendererID();
 	}
 
