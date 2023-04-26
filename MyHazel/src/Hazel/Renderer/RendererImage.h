@@ -13,7 +13,7 @@ namespace Hazel {
 		static void OnRender();
 		static uint32_t GetImage();
 	private:
-		static uint32_t GetPerPixel(const glm::vec2& vecCoord);
+		static glm::vec4 CastRay(const glm::vec2& fragCoord);
 		static Ref<Image> m_Image;
 	};
 }

@@ -2,6 +2,7 @@
 
 #include "Hazel/Renderer/Texture.h"
 #include "Hazel/Core/DataBuffer.h"
+#include <glm/glm.hpp>
 
 namespace Hazel {
 
@@ -19,6 +20,8 @@ namespace Hazel {
 
 		void UpdateImage();
 		void Resize(uint32_t width, uint32_t height);
+
+		static uint32_t ConvertToRGBA(const glm::vec4& color);
 
 	private:
 		Ref<Texture2D> m_Texture;

@@ -101,7 +101,6 @@ namespace Hazel {
 		m_RenderViewPortSize.x = ImGui::GetContentRegionAvail().x;
 		m_RenderViewPortSize.y = ImGui::GetContentRegionAvail().y;
 
-
 		auto image = RendererImage::GetImage();
 		if (image > 0)
 		{
