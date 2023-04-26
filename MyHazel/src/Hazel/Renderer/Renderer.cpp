@@ -1,7 +1,7 @@
 #include "hzpch.h"
 #include "Renderer.h"
 #include "Renderer2D.h"
-#include "RendererImage.h"
+#include "Hazel/RayTracing/RayTracingRenderImage.h"
 
 #include "Platform/OpenGL/OpenGLShader.h"
 
@@ -15,7 +15,7 @@ namespace Hazel {
 
 		RenderCommand::Init();
 		Renderer2D::Init();
-		RendererImage::Init();
+		RayTracingRenderImage::Init();
 	}
 
 	void Renderer::Shutdown()

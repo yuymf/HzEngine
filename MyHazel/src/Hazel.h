@@ -34,7 +34,9 @@
 #include "Hazel/Renderer/FrameBuffer.h"
 
 #include "Hazel/Renderer/OrthographicCamera.h"
+
 // ------------------------------------ 
 #include "Hazel/Renderer/Image/Image.h"
+#include "Hazel/RayTracing/RayTracingCamera.h"
 
 #include "Hazel/Math/Random.h"

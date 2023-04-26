@@ -18,6 +18,7 @@ namespace Hazel {
 		static glm::vec2 GetMousePosition();
 		static float GetMouseX();
 		static float GetMouseY();
+		static void SetCursorMode(CursorMode mode);
 
 	};
 }

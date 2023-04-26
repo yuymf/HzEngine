@@ -67,3 +67,5 @@ float fA = glm::dot(rayDirection, rayDirection);
 ![image-20230426153507163](img/image-20230426153507163.png)
 
 a << 24 | b << 16 | g << 8 | r
+
+### 3.Camera

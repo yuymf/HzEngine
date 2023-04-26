@@ -22,5 +22,13 @@ namespace Hazel
 			ButtonRight = Button1,
 			ButtonMiddle = Button2
 		};
+
 	}
+
+	enum class CursorMode
+	{
+		Normal = 0,
+		Hidden = 1,
+		Locked = 2
+	};
 }

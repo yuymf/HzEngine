@@ -1,13 +1,27 @@
 #include "RayTracingLayer.h"
 #include <ImGui/imgui.h>
-#include "Hazel/Renderer/RendererImage.h"
+#include "Hazel/RayTracing/RayTracingRenderImage.h"
 
 namespace Hazel {
 
 	RayTracingLayer::RayTracingLayer()
-		: m_RenderViewPortSize(ImVec2(0.0f, 0.0f)), m_Timer(CreateRef<Timer>()), m_LastRenderTime(0.f)
+		: m_RenderViewPortSize(ImVec2(0.0f, 0.0f)), m_Camera(CreateRef<RayTracingCamera>(45.0f, 0.1f, 100.0f)),
+		m_Scene(CreateRef<RayTracingScene>()), m_Timer(CreateRef<Timer>()), m_LastRenderTime(0.f)
 	{
 
+	}
+
+	void RayTracingLayer::OnUpdate(Timestep ts)
+	{
+		m_Timer->Reset();
+
+		m_Camera->OnResize(m_RenderViewPortSize.x, m_RenderViewPortSize.y);
+		m_Camera->OnUpdate(ts);
+
+		m_Scene->OnViewPortResize(m_RenderViewPortSize.x, m_RenderViewPortSize.y);
+		m_Scene->OnUpdate(ts, m_Camera);
+
+		m_LastRenderTime = m_Timer->ElapsedMillis();
 	}
 
 	void RayTracingLayer::OnAttach()
@@ -91,17 +105,16 @@ namespace Hazel {
 		ImGui::Text("Last render: %.3fms", m_LastRenderTime);
 		if (ImGui::Button("Render"))
 		{
-			Render();
+			// Render();
 		}
 		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
 		ImGui::Begin("ViewPort");
 
-		m_RenderViewPortSize.x = ImGui::GetContentRegionAvail().x;
-		m_RenderViewPortSize.y = ImGui::GetContentRegionAvail().y;
+		m_RenderViewPortSize = ImGui::GetContentRegionAvail();
 
-		auto image = RendererImage::GetImage();
+		auto image = m_Scene->GetRenderImage();
 		if (image > 0)
 		{
 			ImGui::Image((void*)image, m_RenderViewPortSize, ImVec2(0, 1), ImVec2(1, 0));
@@ -111,19 +124,5 @@ namespace Hazel {
 		ImGui::PopStyleVar();
 
 		ImGui::End();
-
-		Render();
 	}
-
-
-	void RayTracingLayer::Render()
-	{
-		m_Timer->Reset();
-
-		RendererImage::OnWindowResize(m_RenderViewPortSize.x, m_RenderViewPortSize.y);
-		RendererImage::OnRender();
-
-		m_LastRenderTime = m_Timer->ElapsedMillis();
-	}
-
 }
