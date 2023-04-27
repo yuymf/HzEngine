@@ -6,10 +6,15 @@
 namespace Hazel {
 
 	Ref<Image> RayTracingRenderImage::m_Image = nullptr;
+	Ref<RayTracingRenderImage::RayTracingData> RayTracingRenderImage::m_RayTracingData = nullptr;
 
 	void RayTracingRenderImage::Init()
 	{
 		m_Image = CreateRef<Image>();
+		m_RayTracingData = CreateRef<RayTracingData>();
+		m_RayTracingData->rayData = CreateRef<Ray>();
+		m_RayTracingData->viewMat = glm::mat4(1.0f);
+		m_RayTracingData->projectionMat = glm::mat4(1.0f);
 	}
 
 	void RayTracingRenderImage::OnWindowResize(uint32_t width, uint32_t height)
@@ -22,13 +27,20 @@ namespace Hazel {
 
 	void RayTracingRenderImage::BeginScene(const Ref<RayTracingCamera>& camera)
 	{
+		m_RayTracingData->rayData->Origin = camera->GetPosition();
+		m_RayTracingData->viewMat = camera->GetInverseView();
+		m_RayTracingData->projectionMat = camera->GetInverseProjection();
+	}
+
+	void RayTracingRenderImage::OnRender(const std::vector<Ref<Sphere>>& spheres)
+	{
+		if (spheres.empty()) 
+		{
+			return;
+		}
+
 		auto width = m_Image->GetWidth();
 		auto height = m_Image->GetHeight();
-		// Cast ray from camera:
-		auto ray = CreateRef<Ray>();
-		ray->Origin = camera->GetPosition();
-		const auto& view = camera->GetInverseView();
-		const auto& projection = camera->GetInverseProjection();
 
 		auto imageData = m_Image->GetImageData();
 		for (uint32_t y = 0; y < height; y++)
@@ -37,20 +49,20 @@ namespace Hazel {
 			{
 				glm::vec2 vec2Coord = { static_cast<float>(x) / static_cast<float>(width),
 					static_cast<float>(y) / static_cast<float>(height) };
-				vec2Coord = vec2Coord * 2.f - 1.f; //(0~1)->(-1,1)
-				// Get every direction:
-				glm::vec4 target = projection * glm::vec4(vec2Coord.x, vec2Coord.y, 1, 1);
-				ray->Direction = glm::vec3(view * glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0)); // World space
+				vec2Coord = vec2Coord * 2.f - 1.f; 
 
-				imageData[x + y * width] = Image::ConvertToRGBA(CastRay(ray));
+				glm::vec4 target = m_RayTracingData->projectionMat * glm::vec4(vec2Coord.x, vec2Coord.y, 1, 1);
+				m_RayTracingData->rayData->Direction = glm::vec3(m_RayTracingData->viewMat * 
+					glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0)); // World space
+
+				imageData[x + y * width] = Image::ConvertToRGBA(CastRay(spheres));
 			}
 		}
-		m_Image->UpdateImage();
 	}
 
 	void RayTracingRenderImage::EndScene()
 	{
-
+		m_Image->UpdateImage();
 	}
 
 	uint32_t RayTracingRenderImage::GetImage()
@@ -59,25 +71,44 @@ namespace Hazel {
 	}
 
 	// View this func just ShaderToy's input
-	glm::vec4 RayTracingRenderImage::CastRay(const Ref<Ray>& ray)
+	glm::vec4 RayTracingRenderImage::CastRay(const std::vector<Ref<Sphere>>& spheres)
 	{
-		// Sub part:
-		float radius(0.5f);
-		glm::vec3 baseColor = glm::vec3(1, 0, 1);
+		auto castRay = m_RayTracingData->rayData;
 
-		// Cal part:
-		float fA = glm::dot(ray->Direction, ray->Direction);
-		float fB = 2.f * glm::dot(ray->Origin, ray->Direction);
-		float fC = glm::dot(ray->Origin, ray->Origin) - radius * radius;
-		float discriminant = fB * fB - 4.0f * fA * fC;
+		// 1.Ray hit which Sphere:
+		Ref<Sphere> hitSphere = nullptr;
+		float hitDistance = std::numeric_limits<float>::max();
+		for (auto& sphere : spheres)
+		{
+			float radius = sphere->GetRadius();
+			glm::vec3 origin = castRay->Origin - sphere->GetPosition();
 
-		if (discriminant < 0.0f)
+			// Cal part:
+			float fA = glm::dot(castRay->Direction, castRay->Direction);
+			float fB = 2.f * glm::dot(origin, castRay->Direction);
+			float fC = glm::dot(origin, origin) - radius * radius;
+			float discriminant = fB * fB - 4.0f * fA * fC;
+
+			if (discriminant < 0.0f) continue;  // if miss, next sphere
+
+			float clostHit = (-fB - glm::sqrt(discriminant)) / (2.f * fA);
+			//float h1 = (-fB + glm::sqrt(discriminant)) / (2.f * fA);
+
+			if (clostHit < hitDistance)
+			{
+				hitDistance = clostHit;
+				hitSphere = sphere;
+			}
+		}
+
+		if (hitSphere == nullptr)
 			return glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
-		float h0 = (-fB - glm::sqrt(discriminant)) / (2.f * fA);
-		float h1 = (-fB + glm::sqrt(discriminant)) / (2.f * fA);
+		// 2. Treat the hit Sphere:
+		glm::vec3 baseColor = hitSphere->GetMaterial()->GetAlbedo();
+		glm::vec3 hitOrigin = castRay->Origin - hitSphere->GetPosition();
+		glm::vec3 clostHitPoint = hitOrigin + castRay->Direction * hitDistance;
 
-		glm::vec3 clostHitPoint = ray->Origin + ray->Direction * h0;
 		// Out part:
 		glm::vec3 lightDir = glm::normalize(glm::vec3(-1.f, -1.f, -1.f));
 		glm::vec3 normal = glm::normalize(clostHitPoint);

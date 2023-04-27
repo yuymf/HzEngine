@@ -2,13 +2,17 @@
 #include <ImGui/imgui.h>
 #include "Hazel/RayTracing/RayTracingRenderImage.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 namespace Hazel {
 
 	RayTracingLayer::RayTracingLayer()
 		: m_RenderViewPortSize(ImVec2(0.0f, 0.0f)), m_Camera(CreateRef<RayTracingCamera>(45.0f, 0.1f, 100.0f)),
 		m_Scene(CreateRef<RayTracingScene>()), m_Timer(CreateRef<Timer>()), m_LastRenderTime(0.f)
 	{
-
+		m_Scene->AddSphere(CreateRef<Sphere>(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f, CreateRef<RayTracingMaterial>(glm::vec3(1.0f, 0.0f, 1.0f))));
+		m_Scene->AddSphere(CreateRef<Sphere>(glm::vec3(1.0f, 0.0f,-5.0f), 1.5f, CreateRef<RayTracingMaterial>(glm::vec3(0.2f, 0.3f, 1.0f))));
 	}
 
 	void RayTracingLayer::OnUpdate(Timestep ts)
@@ -103,6 +107,7 @@ namespace Hazel {
 			ImGui::EndMenuBar();
 		}
 
+		// UI: Settings------------------------------------------------------------------------------------------
 		ImGui::Begin("Settings");
 		ImGui::Text("Last render: %.3fms", m_LastRenderTime);
 		if (ImGui::Button("Render"))
@@ -110,8 +115,26 @@ namespace Hazel {
 			// Render();
 		}
 		ImGui::End();
+		// -----------------------------------------------------------------------------------------------------
+		
+		// UI: Scene--------------------------------------------------------------------------------------------
+		ImGui::Begin("Scene");
+		auto& vecSphere = m_Scene->GetSpheres();
+		for (auto i = 0; i < vecSphere.size(); i++)
+		{
+			ImGui::PushID(i);
+			ImGui::DragFloat3("Position", glm::value_ptr(vecSphere[i]->GetPosition()), 0.1f);
+			ImGui::DragFloat("Radius", &vecSphere[i]->GetRadius(), 0.1f);
+			ImGui::ColorEdit3("Albedo", glm::value_ptr(vecSphere[i]->GetMaterial()->GetAlbedo()));
+			ImGui::Separator();
+			ImGui::PopID();
+		}
+		ImGui::End();
+		// -----------------------------------------------------------------------------------------------------
 
+		// UI: ViewPort-----------------------------------------------------------------------------------------
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
+
 		ImGui::Begin("ViewPort");
 
 		m_RenderViewPortSize = ImGui::GetContentRegionAvail();
@@ -124,6 +147,7 @@ namespace Hazel {
 
 		ImGui::End();
 		ImGui::PopStyleVar();
+		// -----------------------------------------------------------------------------------------------------
 
 		ImGui::End();
 	}
