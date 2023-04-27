@@ -14,12 +14,14 @@ namespace Hazel {
 	void RayTracingLayer::OnUpdate(Timestep ts)
 	{
 		m_Timer->Reset();
+		if (m_RenderViewPortSize.x > 0 && m_RenderViewPortSize.y > 0)
+		{
+			m_Camera->OnResize(m_RenderViewPortSize.x, m_RenderViewPortSize.y);
+			m_Camera->OnUpdate(ts);
 
-		m_Camera->OnResize(m_RenderViewPortSize.x, m_RenderViewPortSize.y);
-		m_Camera->OnUpdate(ts);
-
-		m_Scene->OnViewPortResize(m_RenderViewPortSize.x, m_RenderViewPortSize.y);
-		m_Scene->OnUpdate(ts, m_Camera);
+			m_Scene->OnViewPortResize(m_RenderViewPortSize.x, m_RenderViewPortSize.y);
+			m_Scene->OnUpdate(ts, m_Camera);
+		}
 
 		m_LastRenderTime = m_Timer->ElapsedMillis();
 	}
