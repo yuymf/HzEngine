@@ -11,10 +11,10 @@ namespace Hazel {
 		void OnUpdate(const Timestep& timeStep, const Ref<RayTracingCamera>& camera);
 		void OnViewPortResize(uint32_t width, uint32_t height);
 		void AddSphere(const Ref<Sphere>& sphere);
-		std::vector<Ref<Sphere>> GetSpheres() const;
+		SphereMap& GetSpheres();
 		uint32_t GetRenderImage() const;
-	private:
 
-		std::vector<Ref<Sphere>> m_Spheres;
+	private:
+		SphereMap m_Spheres;
 	};
 }

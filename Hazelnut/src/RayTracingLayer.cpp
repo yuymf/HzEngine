@@ -11,8 +11,25 @@ namespace Hazel {
 		: m_RenderViewPortSize(ImVec2(0.0f, 0.0f)), m_Camera(CreateRef<RayTracingCamera>(45.0f, 0.1f, 100.0f)),
 		m_Scene(CreateRef<RayTracingScene>()), m_Timer(CreateRef<Timer>()), m_LastRenderTime(0.f)
 	{
-		m_Scene->AddSphere(CreateRef<Sphere>(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f, CreateRef<RayTracingMaterial>(glm::vec3(1.0f, 0.0f, 1.0f))));
-		m_Scene->AddSphere(CreateRef<Sphere>(glm::vec3(1.0f, 0.0f,-5.0f), 1.5f, CreateRef<RayTracingMaterial>(glm::vec3(0.2f, 0.3f, 1.0f))));
+		// Submit Sphere Here
+		{
+			auto material = CreateRef<Material>();
+			material->SetAlbedo(glm::vec3(1.f, 0.f, 1.f));
+
+			auto addedSphere = CreateRef<Sphere>(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 0);
+			addedSphere->SetMaterial(material);
+
+			m_Scene->AddSphere(addedSphere);
+		}
+		{
+			auto material = CreateRef<Material>();
+			material->SetAlbedo(glm::vec3(0.2f, 0.3f, 1.f));
+
+			auto addedSphere = CreateRef<Sphere>(glm::vec3(1.f, -101.f, -5.f), 100.f, 1);
+			addedSphere->SetMaterial(material);
+
+			m_Scene->AddSphere(addedSphere);
+		}	
 	}
 
 	void RayTracingLayer::OnUpdate(Timestep ts)

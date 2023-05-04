@@ -213,12 +213,11 @@ glm::vec4 RayTracingRenderImage::CastRay(const std::vector<Ref<Sphere>>& spheres
 
     // 2. Treat the hit Sphere:
     glm::vec3 baseColor = hitSphere->GetMaterial()->GetAlbedo();
-    glm::vec3 hitOrigin = castRay->Origin - hitSphere->GetPosition();
-    glm::vec3 clostHitPoint = hitOrigin + castRay->Direction * hitDistance;
+    glm::vec3 clostHitPoint = castRay->Origin + castRay->Direction * hitDistance;
 
     // Out part:
     glm::vec3 lightDir = glm::normalize(glm::vec3(-1.f, -1.f, -1.f));
-    glm::vec3 normal = glm::normalize(clostHitPoint);
+    glm::vec3 normal = glm::normalize(clostHitPoint - hitSphere->GetPosition);
 
     // Light:
     float diffuse = glm::max(glm::dot(normal, -lightDir), 0.f);
@@ -233,3 +232,87 @@ glm::vec4 RayTracingRenderImage::CastRay(const std::vector<Ref<Sphere>>& spheres
 1. 这样写法线仍然是击中点（- hitSphere->GetPosition()）；
 
 2. 注意因为**只是移动相机位置**，**光线没动**，对移动物体的光照发射位置对应光照- hitSphere->GetPosition()
+
+##### Q4. UI分别控制不同球体
+
+**PushID(i)**, **PopID()**非常关键，没有这一步的话会同时控制
+
+```cpp
+ImGui::Begin("Scene");
+auto& vecSphere = m_Scene->GetSpheres();
+for (auto i = 0; i < vecSphere.size(); i++)
+{
+    ImGui::PushID(i);
+    ImGui::DragFloat3("Position", glm::value_ptr(vecSphere[i]->GetPosition()), 0.1f);
+    ImGui::DragFloat("Radius", &vecSphere[i]->GetRadius(), 0.1f);
+    ImGui::ColorEdit3("Albedo", glm::value_ptr(vecSphere[i]->GetMaterial()->GetAlbedo()));
+    ImGui::Separator();
+    ImGui::PopID();
+}
+ImGui::End();
+```
+
+### 5.Multi Bounce
+
+![image-20230504174621447](img/image-20230504174621447.png)
+
+##### Q1. MainSteps
+
+```cpp
+// Bounce Loop
+for (int i = 0; i < rayBounces; i++)
+{
+    auto hitPayload = CastRay(calcRay, spheres);
+    if (hitPayload == nullptr)
+    {
+        break;
+    }
+    // Out part:
+    const auto& sphere = spheres.find(hitPayload->EntityID)->second;
+    glm::vec3 baseColor = sphere->GetMaterial()->GetAlbedo();
+
+    glm::vec3 lightDir = glm::normalize(glm::vec3(-1.f, -1.f, -1.f));
+    glm::vec3 normal = hitPayload->WorldNormal;
+
+    // Light:
+    float diffuse = glm::max(glm::dot(normal, -lightDir), 0.f);
+
+    outColor += multiplier * diffuse * baseColor;
+
+    // Attenuation:
+    multiplier *= 0.7f;
+    calcRay->Origin = hitPayload->WorldPosition + hitPayload->WorldNormal * 0.0001f;
+    calcRay->Direction = glm::reflect(calcRay->Direction, hitPayload->WorldNormal);
+}
+return glm::vec4(outColor, 1);
+```
+
+每像素多次光线反射，每次计算outColor后进行衰减：
+
+**a).强度衰减:multiplier *= 0.7f; b).光线命中点朝击中点法线微移（否则会反复碰撞); c).光线方向依法线反射:glm::reflect**
+
+##### Q2.相机移动到球内部会全黑
+
+相机到击中点最近距离需要保证为正！
+
+```cpp
+			if (clostHit > 0.f && clostHit < hitDistance)
+			{
+				hitDistance = clostHit;
+				hitSphere = sphere;
+			}
+```
+
+##### Q3. 没有反射全
+
+错误如下，下半部分的反射消失
+
+![image-20230504161754699](img/image-20230504161754699.png)
+
+```cpp
+// glm::vec3 hitOrigin = castRay->Origin - hitSphere->GetPosition();
+// hitInfo->WorldPosition = hitOrigin + castRay->Direction * hitDistance;
+hitInfo->WorldPosition = castRay->Origin + castRay->Direction * hitDistance;
+```
+
+相机位置不会影响WorldPosition位置

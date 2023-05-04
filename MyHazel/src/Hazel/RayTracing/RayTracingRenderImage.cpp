@@ -32,7 +32,7 @@ namespace Hazel {
 		m_RayTracingData->projectionMat = camera->GetInverseProjection();
 	}
 
-	void RayTracingRenderImage::OnRender(const std::vector<Ref<Sphere>>& spheres)
+	void RayTracingRenderImage::OnRender(const SphereMap& spheres)
 	{
 		if (spheres.empty()) 
 		{
@@ -55,7 +55,7 @@ namespace Hazel {
 				m_RayTracingData->rayData->Direction = glm::vec3(m_RayTracingData->viewMat * 
 					glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0)); // World space
 
-				imageData[x + y * width] = Image::ConvertToRGBA(CastRay(spheres));
+				imageData[x + y * width] = Image::ConvertToRGBA(PerPixel(m_RayTracingData->rayData, spheres));
 			}
 		}
 	}
@@ -70,16 +70,54 @@ namespace Hazel {
 		return m_Image->GetImage();
 	}
 
-	// View this func just ShaderToy's input
-	glm::vec4 RayTracingRenderImage::CastRay(const std::vector<Ref<Sphere>>& spheres)
+	glm::vec4 RayTracingRenderImage::PerPixel(Ref<Ray> ray, const SphereMap& spheres)
 	{
-		auto castRay = m_RayTracingData->rayData;
+		glm::vec3 outColor(glm::vec3(0.0f, 0.0f, 0.0f));
+		uint8_t rayBounces = 2;
+		float multiplier = 1.0f;
 
+		// Light Initial
+		auto calcRay = CreateRef<Ray>();
+		calcRay->Origin = ray->Origin;
+		calcRay->Direction = ray->Direction;
+
+		// Bounce Loop
+		for (int i = 0; i < rayBounces; i++)
+		{
+			auto hitPayload = CastRay(calcRay, spheres);
+			if (hitPayload == nullptr)
+			{
+				break;
+			}
+			// Out part:
+			const auto& sphere = spheres.find(hitPayload->EntityID)->second;
+			glm::vec3 baseColor = sphere->GetMaterial()->GetAlbedo();
+
+			glm::vec3 lightDir = glm::normalize(glm::vec3(-1.f, -1.f, -1.f));
+			glm::vec3 normal = hitPayload->WorldNormal;
+
+			// Light:
+			float diffuse = glm::max(glm::dot(normal, -lightDir), 0.f);
+
+			outColor += multiplier * diffuse * baseColor;
+
+			// Attenuation:
+			multiplier *= 0.7f;
+			calcRay->Origin = hitPayload->WorldPosition + hitPayload->WorldNormal * 0.0001f;
+			calcRay->Direction = glm::reflect(calcRay->Direction, hitPayload->WorldNormal);
+		}
+		return glm::vec4(outColor, 1);
+	}
+
+	// View this func just ShaderToy's input
+	Ref<HitInfo> RayTracingRenderImage::CastRay(const Ref<Ray>& castRay, const SphereMap& spheres)
+	{
 		// 1.Ray hit which Sphere:
 		Ref<Sphere> hitSphere = nullptr;
 		float hitDistance = std::numeric_limits<float>::max();
-		for (auto& sphere : spheres)
+		for (const auto& it : spheres)
 		{
+			const auto& sphere = it.second;
 			float radius = sphere->GetRadius();
 			glm::vec3 origin = castRay->Origin - sphere->GetPosition();
 
@@ -94,7 +132,7 @@ namespace Hazel {
 			float clostHit = (-fB - glm::sqrt(discriminant)) / (2.f * fA);
 			//float h1 = (-fB + glm::sqrt(discriminant)) / (2.f * fA);
 
-			if (clostHit < hitDistance)
+			if (clostHit > 0.f && clostHit < hitDistance)
 			{
 				hitDistance = clostHit;
 				hitSphere = sphere;
@@ -102,22 +140,16 @@ namespace Hazel {
 		}
 
 		if (hitSphere == nullptr)
-			return glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+			return nullptr;
 
-		// 2. Treat the hit Sphere:
-		glm::vec3 baseColor = hitSphere->GetMaterial()->GetAlbedo();
-		glm::vec3 hitOrigin = castRay->Origin - hitSphere->GetPosition();
-		glm::vec3 clostHitPoint = hitOrigin + castRay->Direction * hitDistance;
+		// 2. Treat the hit Sphere, Note the hitInfo:
+		auto hitInfo = CreateRef<HitInfo>();
+		hitInfo->HitDistance = hitDistance;
+		hitInfo->WorldPosition = castRay->Origin + castRay->Direction * hitDistance;
+		hitInfo->WorldNormal = glm::normalize(hitInfo->WorldPosition - hitSphere->GetPosition());
+		hitInfo->EntityID = hitSphere->GetEntityID();
 
-		// Out part:
-		glm::vec3 lightDir = glm::normalize(glm::vec3(-1.f, -1.f, -1.f));
-		glm::vec3 normal = glm::normalize(clostHitPoint);
-
-		// Light:
-		float diffuse = glm::max(glm::dot(normal, -lightDir), 0.f);
-		glm::vec3 color = diffuse * baseColor;
-
-		return glm::vec4(color, 1);
+		return hitInfo;
 	}
 
 }

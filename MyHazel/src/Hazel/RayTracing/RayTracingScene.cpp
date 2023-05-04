@@ -9,7 +9,6 @@ namespace Hazel {
 		RayTracingRenderImage::BeginScene(camera);
 		RayTracingRenderImage::OnRender(m_Spheres);
 		RayTracingRenderImage::EndScene();
-
 	}
 
 	void RayTracingScene::OnViewPortResize(uint32_t width, uint32_t height)
@@ -19,10 +18,10 @@ namespace Hazel {
 
 	void RayTracingScene::AddSphere(const Ref<Sphere>& sphere)
 	{
-		m_Spheres.push_back(sphere);
+		m_Spheres[sphere->GetEntityID()] = sphere;
 	}
 
-	std::vector<Ref<Sphere>> RayTracingScene::GetSpheres() const
+	SphereMap& RayTracingScene::GetSpheres()
 	{
 		return m_Spheres;
 	}

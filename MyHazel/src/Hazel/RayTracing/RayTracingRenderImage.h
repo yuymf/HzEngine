@@ -6,7 +6,7 @@
 #include "Hazel/RayTracing/RayTracingScene.h"
 
 class Sphere;
-class RayTracingMaterial;
+class Material;
 
 namespace Hazel {
 
@@ -23,13 +23,14 @@ namespace Hazel {
 		static void Init();
 		static void OnWindowResize(uint32_t width, uint32_t height);
 		static void BeginScene(const Ref<RayTracingCamera>& camera);
-		static void OnRender(const std::vector<Ref<Sphere>>& spheres);
+		static void OnRender(const SphereMap& spheres);
 		static void EndScene();
 		static uint32_t GetImage();
 
 	private:
-		static glm::vec4 CastRay(const std::vector<Ref<Sphere>>& spheres);
-
+		static glm::vec4 PerPixel(Ref<Ray> ray, const SphereMap& spheres);
+		static Ref<HitInfo> CastRay(const Ref<Ray>& castRay, const SphereMap& spheres);
+		  
 	private:
 		static Ref<Image> m_Image;
 		static Ref<RayTracingData> m_RayTracingData;
